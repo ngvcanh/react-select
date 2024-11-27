@@ -1,4 +1,5 @@
 import {
+  ChangeEvent,
   ComponentType,
   forwardRef,
   Fragment,
@@ -40,6 +41,9 @@ export interface SelectProps {
   iconDropdown?: ReactNode;
   iconRemove?: ReactNode;
   iconSearch?: ReactNode;
+  removable?: boolean;
+  separator?: boolean;
+  maxHeight?: SelectPrimitive;
   renderChip?(option: SelectOption | number): JSX.Element;
   renderValue?(option: SelectOption, params: SelectRenderValueParams): ReactNode;
   onChange?(e: SyntheticEvent): void;
@@ -70,6 +74,9 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
       iconDropdown,
       iconRemove,
       iconSearch,
+      removable,
+      separator,
+      maxHeight,
       renderChip,
       renderValue = defaultRenderValue,
       onChange,
@@ -82,6 +89,18 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
 
     const containerRef = useRef<HTMLDivElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const searchRef = useRef<HTMLInputElement>(null);
+    
+    const getMaxHeight = useCallback(() => {
+      if (typeof window === "undefined" || !containerRef.current || typeof maxHeight !== "undefined") {
+        return maxHeight;
+      }
+
+      const { innerHeight } = window;
+      const anchorHeight = containerRef.current.getBoundingClientRect().height + offset;
+
+      return `${innerHeight - anchorHeight}px`;
+    }, [containerRef, maxHeight, offset]);
 
     useEffect(() => {
       const nextValue = normalize(value);
@@ -90,24 +109,65 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
     }, [value]);
 
     useEffect(() => {
-      if (!isOpen) {
+      if (!isOpen || !containerRef.current || !dropdownRef.current) {
         return;
       }
 
       function updatePosition() {
-        if (!containerRef.current || !dropdownRef.current) {
+        if (!containerRef.current || !dropdownRef.current || typeof window === "undefined") {
           return;
         }
 
         const containerRect = containerRef.current.getBoundingClientRect();
+        const dropdownRect = dropdownRef.current.getBoundingClientRect();
+
+        const topOfDropdown = containerRect.bottom + offset;
+        const dropdownHeight = dropdownRect.height;
 
         dropdownRef.current.style.width = `${containerRect.width}px`;
-        dropdownRef.current.style.top = `${window.scrollY + containerRect.bottom + offset}px`;
         dropdownRef.current.style.left = `${containerRect.left}px`;
+
+        if (
+          topOfDropdown + dropdownHeight > window.innerHeight &&
+          dropdownHeight + offset < containerRect.top
+        ) {
+          dropdownRef.current.style.top = `${containerRect.top - offset -dropdownHeight}px`;
+        } else {
+          dropdownRef.current.style.top = `${containerRect.bottom + offset}px`;
+        }
       }
 
+      const resizeObserver = new ResizeObserver(updatePosition);
+      const mutationServer = new MutationObserver(updatePosition);
+      const intersectionObserver = new IntersectionObserver(updatePosition, {
+        root: null,
+        rootMargin: "0px",
+        threshold: [0, 1],
+      });
+
+      resizeObserver.observe(containerRef.current);
+      resizeObserver.observe(dropdownRef.current);
+      intersectionObserver.observe(containerRef.current);
+
+      mutationServer.observe(dropdownRef.current, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
+
       requestAnimationFrame(updatePosition);
-    }, [isOpen, dropdownRef, containerRef, offset]);
+
+      window.addEventListener("resize", updatePosition);
+      window.addEventListener("scroll", updatePosition);
+
+      return () => {
+        resizeObserver.disconnect();
+        mutationServer.disconnect();
+        intersectionObserver.disconnect();
+        window.removeEventListener("resize", updatePosition);
+        window.removeEventListener("scroll", updatePosition);
+      };
+    }, [isOpen, offset]);
 
     useEffect(() => {
       if (typeof document === "undefined") {
@@ -122,6 +182,8 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
           return;
         }
 
+        setSearchTerm("");
+        setShouldFilter(false);
         setIsOpen(false);
       }
 
@@ -134,8 +196,13 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
 
     const handleRemoveValue = useCallback((option: SelectOption) => (e: ReactMouseEvent) => {
       e.preventDefault();
-      console.log("Remove value", option);
+      e.stopPropagation();
+      setCurrentValue((prev) => prev.filter((value) => value !== option.value));
     }, []);
+
+    useEffect(() => {
+      isOpen && searchable && searchRef.current?.focus();
+    }, [isOpen, searchable, searchRef]);
 
     const anchorValue = useMemo(() => 
       renderSelected({
@@ -151,6 +218,8 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
         searchPosition,
         searchTerm,
         isOpen,
+        removable,
+        searchRef,
         setSearchTerm,
         setShouldFilter,
         renderValue,
@@ -159,7 +228,7 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
       }),
       [
         chip, currentValue, displayCount, iconRemove, multiple, options, placeholder, searchTerm, searchable,
-        truncate, searchPosition, isOpen, renderChip, renderValue, handleRemoveValue
+        truncate, searchPosition, isOpen, removable, renderChip, renderValue, handleRemoveValue
       ]
     );
 
@@ -196,6 +265,11 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
       }
     };
 
+    const handleChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
+      setSearchTerm(e.target.value);
+      setShouldFilter(true);
+    };
+
     return (
       <>
         <div ref={containerRef} className={className}>
@@ -210,28 +284,36 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
               <div className={clsx("flex-1 min-w-0", truncate ? "truncate" : "")}>
                 {anchorValue}
               </div>
+              {separator && <div className="w-px h-4 bg-gray-200" />}
               {iconDropdown || (
-                <ChevronDown
-                  className={`w-4 h-4 transition-transform ${
-                    isOpen ? 'transform rotate-180' : ''
-                  }`}
-                />
+                <span className="flex h-full px-2 -mr-2">
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform ${
+                      isOpen ? 'transform rotate-180' : ''
+                    }`}
+                  />
+                </span>
               )}
             </div>
           </Wrapper>
         </div>
         {isOpen && typeof document !== 'undefined' && createPortal(
-          <div ref={dropdownRef} className="absolute z-10 w-full bg-white border rounded shadow-lg text-slate-950">
+          <div
+            ref={dropdownRef}
+            className="fixed z-10 w-full bg-white border rounded shadow-lg text-slate-950 text-sm"
+            style={{ maxHeight: getMaxHeight() }}
+          >
             {searchable && searchPosition === "dropdown" && (
               <div className="p-2 border-b">
                 <div className="flex items-center px-2 border rounded">
                   {iconSearch || <Search className="w-4 h-4 text-gray-400" />}
                   <input
+                    ref={searchRef}
                     type="text"
                     className="w-full p-1 text-sm focus:outline-none"
                     placeholder="Search..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={handleChangeSearch}
                     onClick={(e) => e.stopPropagation()}
                   />
                 </div>

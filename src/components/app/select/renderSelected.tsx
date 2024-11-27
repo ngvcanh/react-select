@@ -1,4 +1,4 @@
-import { ChangeEvent, Fragment, MouseEvent, ReactNode } from "react";
+import { ChangeEvent, Fragment, MouseEvent, ReactNode, RefObject } from "react";
 import { SelectOption, SelectPrimitive, SelectRenderValueParams } from "./types";
 import { defaultRenderValue } from "./utils";
 import { X } from "lucide-react";
@@ -17,6 +17,8 @@ export interface RenderSelected {
   searchable?: boolean;
   searchPosition?: "anchor" | "dropdown";
   isOpen?: boolean;
+  removable?: boolean;
+  searchRef?: RefObject<HTMLInputElement>;
   setSearchTerm(value: string): void;
   setShouldFilter(value: boolean): void;
   renderChip?(option: SelectOption | number): JSX.Element;
@@ -38,6 +40,8 @@ export function renderSelected(props: RenderSelected) {
     searchable,
     searchPosition = "anchor",
     isOpen,
+    removable = true,
+    searchRef,
     setSearchTerm,
     setShouldFilter,
     renderValue = defaultRenderValue,
@@ -61,6 +65,7 @@ export function renderSelected(props: RenderSelected) {
     return (
       <div className="flex items-center flex-1 h-full">
         <input
+          ref={searchRef}
           type="text"
           className="w-full h-full bg-transparent focus:outline-none"
           placeholder={placeholder}
@@ -113,9 +118,11 @@ export function renderSelected(props: RenderSelected) {
             )}
           >
             <span className={truncate ? "truncate" : ""}>{option?.label}</span>
-            <span className="-mr-2 px-1 h-full inline-flex items-center" onClick={onRemove(option)}>
-              {iconRemove || <X className="w-3 h-3 cursor-pointer hover:text-red-500" />}
-            </span>
+            {removable && (
+              <span className="-mr-2 px-1 h-full inline-flex items-center" onClick={onRemove(option)}>
+                {iconRemove || <X className="w-3 h-3 cursor-pointer hover:text-red-500" />}
+              </span>
+            )}
           </div>
         );
       })}

@@ -50,6 +50,9 @@ export default function Home() {
             showCheckbox
           />
         </Card>
+        <Card title="Normally [separator=true]">
+          <Select options={options} separator />
+        </Card>
       </Section>
       <Section title="Multiple">
       <Card title="Multiple [keepOnSelect=true|default]">
@@ -127,12 +130,46 @@ export default function Home() {
             placeholder="Select option"
           />
         </Card>
+        <Card title="Multiple [chip=true][removable=false]">
+          <Select
+            options={options}
+            multiple
+            chip
+            removable={false}
+            placeholder="Select option"
+          />
+        </Card>
       </Section>
       <Section title="Searchable">
         <Card title='Single [searchPosition="anchor"|default]'>
           <Select
             options={options}
             searchable
+            placeholder="Search..."
+          />
+        </Card>
+        <Card title='Single [searchPosition="dropdown"]'>
+          <Select
+            options={options}
+            searchable
+            searchPosition="dropdown"
+            placeholder="Search..."
+          />
+        </Card>
+        <Card title='Multiple [searchPosition="anchor"|default]'>
+          <Select
+            options={options}
+            searchable
+            multiple
+            placeholder="Search..."
+          />
+        </Card>
+        <Card title='Multiple [searchPosition="dropdown"|]'>
+          <Select
+            options={options}
+            searchable
+            multiple
+            searchPosition="dropdown"
             placeholder="Search..."
           />
         </Card>
