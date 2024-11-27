@@ -18,6 +18,7 @@ import { SelectOption, SelectPrimitive, SelectRenderValueParams } from "./types"
 import { createEvent, defaultRenderValue, isEquals, normalize, toggleValue } from "./utils";
 import { renderSelected } from "./renderSelected";
 import clsx from "clsx";
+import { Breakpoint, Breakpoints, useMediaQuery } from "./useMediaQuery";
 
 export interface SelectProps {
   name?: string;
@@ -44,6 +45,8 @@ export interface SelectProps {
   removable?: boolean;
   separator?: boolean;
   maxHeight?: SelectPrimitive;
+  breakpoint?: Breakpoint;
+  breakpoints?: Partial<Breakpoints>;
   renderChip?(option: SelectOption | number): JSX.Element;
   renderValue?(option: SelectOption, params: SelectRenderValueParams): ReactNode;
   onChange?(e: SyntheticEvent): void;
@@ -77,12 +80,15 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
       removable,
       separator,
       maxHeight,
+      breakpoint = "md",
+      breakpoints,
       renderChip,
       renderValue = defaultRenderValue,
       onChange,
     } = props;
 
     const [isOpen, setIsOpen] = useState(false);
+    const [isOpenModal, setIsOpenModal] = useState(false);
     const [shouldFilter, setShouldFilter] = useState(false);
     const [currentValue, setCurrentValue] = useState(normalize(value));
     const [searchTerm, setSearchTerm] = useState("");
@@ -90,6 +96,8 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
     const containerRef = useRef<HTMLDivElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const searchRef = useRef<HTMLInputElement>(null);
+
+    const isSmallScreen = useMediaQuery(breakpoint, breakpoints);
     
     const getMaxHeight = useCallback(() => {
       if (typeof window === "undefined" || !containerRef.current || typeof maxHeight !== "undefined") {

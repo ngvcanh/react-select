@@ -26,3 +26,4 @@
 - [ ] Async search/load options
 - [ ] Custom option render function
 - [ ] Size variants (support: xs, sm, md[default], lg, xl)
+- [-] Modal responsive
