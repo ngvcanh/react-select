@@ -1,13 +1,16 @@
+import { PropsWithChildren } from "react";
 import { createPortal } from "react-dom";
 
-export function SelectPortal() {
+export interface SelectPortalProps {
+  show: boolean;
+}
 
-  if (typeof document === "undefined") {
+export function SelectPortal(props: PropsWithChildren<SelectPortalProps>) {
+  const { children, show } = props;
+
+  if (!show || typeof document === "undefined") {
     return null;
   }
 
-  return createPortal(
-    <></>,
-    document.body
-  );
+  return createPortal(<>{children}</>, document.body);
 }

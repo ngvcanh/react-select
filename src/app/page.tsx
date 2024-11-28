@@ -174,6 +174,15 @@ export default function Home() {
           />
         </Card>
       </Section>
+      <Section title="Responsive">
+        <Card title="Modal mobile [asModal=true]">
+          <Select
+            options={options}
+            placeholder="Select option"
+            asModal
+          />
+        </Card>
+      </Section>
     </div>
   );
 }

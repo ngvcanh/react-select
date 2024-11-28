@@ -11,3 +11,8 @@ export interface SelectRenderValueParams {
   isLast: boolean;
   index: number;
 }
+
+export interface SelectPortalRef {
+  open(): void;
+  close(): void;
+}
