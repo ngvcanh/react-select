@@ -101,7 +101,6 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
 
     const containerRef = useRef<HTMLDivElement>(null);
     const searchRef = useRef<HTMLInputElement>(null);
-
     const portalRef = useRef<SelectPortalRef>(null);
 
     const isSmallScreen = useMediaQuery(breakpoint, breakpoints);

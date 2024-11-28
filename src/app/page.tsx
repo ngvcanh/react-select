@@ -182,6 +182,14 @@ export default function Home() {
             asModal
           />
         </Card>
+        <Card title="Modal mobile [asModal=true][breakpoint=500]">
+          <Select
+            options={options}
+            placeholder="Select option"
+            breakpoint={500}
+            asModal
+          />
+        </Card>
       </Section>
     </div>
   );
