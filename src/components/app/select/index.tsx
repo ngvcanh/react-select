@@ -2,8 +2,6 @@ import {
   ChangeEvent,
   ComponentType,
   forwardRef,
-  Fragment,
-  MouseEvent as ReactMouseEvent,
   ReactNode,
   SyntheticEvent,
   useCallback,
@@ -12,18 +10,19 @@ import {
   useRef,
   useState
 } from "react";
-import { ChevronDown, Search, Check } from 'lucide-react';
-import { SelectOption, SelectPortalRef, SelectPrimitive, SelectRenderValueParams } from "./types";
-import { createEvent, defaultRenderValue, isEquals, normalize, toggleValue } from "./utils";
-import { renderSelected } from "./renderSelected";
+import { SelectItem, SelectItemGroup, SelectPortalRef, SelectPrimitive, SelectRenderValueParams } from "./types";
+import { createEvent, defaultRenderValue, isEquals, normalizeOptions, normalizeValue, toggleValue } from "./utils";
 import { Breakpoint, Breakpoints, useMediaQuery } from "./useMediaQuery";
 import { SelectDropdown } from "./SelectDropdown";
 import { SelectModal } from "./SelectModal";
-import clsx from "clsx";
+import { SelectSearch } from "./SelectSearch";
+import { SelectMenu } from "./SelectMenu";
+import { SelectAnchor } from "./SelectAnchor";
+import { SelectValue } from "./SelectValue";
 
 export interface SelectProps {
   name?: string;
-  options: SelectOption[];
+  options: SelectItem[];
   value?: SelectPrimitive | SelectPrimitive[];
   placeholder?: string;
   className?: string;
@@ -51,8 +50,12 @@ export interface SelectProps {
   asModal?: boolean;
   backdrop?: "static" | "closeable";
   modalWidth?: SelectPrimitive;
-  renderChip?(option: SelectOption | number): JSX.Element;
-  renderValue?(option: SelectOption, params: SelectRenderValueParams): ReactNode;
+  asChild?: boolean;
+  isGroup?(item: SelectItem): item is SelectItemGroup;
+  getOptionValue?(item: SelectItem): SelectPrimitive;
+  getOptionLabel?(item: SelectItem): SelectPrimitive;
+  renderChip?(option: SelectItem<SelectPrimitive> | number): JSX.Element;
+  renderValue?(option: SelectItem<SelectPrimitive>, params: SelectRenderValueParams): ReactNode;
   onChange?(e: SyntheticEvent): void;
 }
 
@@ -66,7 +69,7 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
       placeholder,
       className,
       chip,
-      wrapper: Wrapper = Fragment,
+      wrapper,
       displayCount = 0,
       searchable,
       searchPosition = "anchor",
@@ -89,6 +92,10 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
       asModal,
       backdrop,
       modalWidth,
+      asChild,
+      isGroup,
+      getOptionValue,
+      getOptionLabel,
       renderChip,
       renderValue = defaultRenderValue,
       onChange,
@@ -96,7 +103,7 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
 
     const [isOpen, setIsOpen] = useState(false);
     const [shouldFilter, setShouldFilter] = useState(false);
-    const [currentValue, setCurrentValue] = useState(normalize(value));
+    const [currentValue, setCurrentValue] = useState(normalizeValue(value));
     const [searchTerm, setSearchTerm] = useState("");
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -105,49 +112,27 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
 
     const isSmallScreen = useMediaQuery(breakpoint, breakpoints);
 
+    const currentOptions = useMemo(() => normalizeOptions({
+      items: options,
+      asChild,
+      isGroup,
+      getOptionValue,
+      getOptionLabel,
+    }), [options, asChild, isGroup, getOptionValue, getOptionLabel]);
+
     useEffect(() => {
-      const nextValue = normalize(value);
+      const nextValue = normalizeValue(value);
       isEquals(nextValue, currentValue) || setCurrentValue(nextValue);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [value]);
 
-    const handleRemoveValue = useCallback((option: SelectOption) => (e: ReactMouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
+    const handleRemoveValue = useCallback((option: SelectItem) => {
       setCurrentValue((prev) => prev.filter((value) => value !== option.value));
     }, []);
 
     useEffect(() => {
       isOpen && searchable && searchRef.current?.focus();
     }, [isOpen, searchable, searchRef]);
-
-    const anchorValue = useMemo(() => 
-      renderSelected({
-        options,
-        currentValue,
-        placeholder,
-        chip,
-        displayCount,
-        multiple,
-        truncate,
-        iconRemove,
-        searchable,
-        searchPosition,
-        searchTerm,
-        isOpen,
-        removable,
-        searchRef,
-        setSearchTerm,
-        setShouldFilter,
-        renderValue,
-        renderChip,
-        onRemove: handleRemoveValue,
-      }),
-      [
-        chip, currentValue, displayCount, iconRemove, multiple, options, placeholder, searchTerm, searchable,
-        truncate, searchPosition, isOpen, removable, renderChip, renderValue, handleRemoveValue
-      ]
-    );
 
     useEffect(() => {
       requestAnimationFrame(() => {
@@ -161,14 +146,13 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
       setIsOpen(false);
     }, []);
 
-    const filteredOptions = options.filter((option) =>
-      !shouldFilter || option.label.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredOptions = currentOptions.filter((option) =>
+      !shouldFilter || option.label?.toString().toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const handleClickAnchor = () => {
       const shouldSetSearchTerm = !isOpen && searchable && !searchTerm && !multiple;
       setIsOpen(true);
-      // selectDropdownRef.current?.open();
 
       if (shouldSetSearchTerm && currentValue.length) {
         const option = options.find((opt) => opt.value === currentValue[0]);
@@ -177,20 +161,15 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
       }
     };
 
-    const handleClickOption = (option: SelectOption) => () => {
-      if (option.disabled) {
-        return;
-      }
-
+    const handleSelect = (option: SelectItem<SelectPrimitive>) => {
       if (multiple) {
-        setCurrentValue((prev) => toggleValue(option.value, prev, maxSelect));
-        onChange?.(createEvent(name, toggleValue(option.value, currentValue, maxSelect)));
+        setCurrentValue((prev) => toggleValue(option.value!, prev, maxSelect));
+        onChange?.(createEvent(name, toggleValue(option.value!, currentValue, maxSelect)));
         keepOnSelect || setIsOpen(false);
       } else {
-        setCurrentValue([option.value]);
-        onChange?.(createEvent(name, option.value));
+        setCurrentValue([option.value!]);
+        onChange?.(createEvent(name, option.value!));
         handleClosePortal();
-        // selectDropdownRef.current?.close();
       }
     };
 
@@ -201,76 +180,61 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
 
     const dropdownContent = (
       <>
-        {searchable && searchPosition === "dropdown" && (
-          <div className="p-2 border-b">
-            <div className="flex items-center px-2 border rounded">
-              {iconSearch || <Search className="w-4 h-4 text-gray-400" />}
-              <input
-                ref={searchRef}
-                type="text"
-                className="w-full p-1 text-sm focus:outline-none"
-                placeholder="Search..."
-                value={searchTerm}
-                onChange={handleChangeSearch}
-                onClick={(e) => e.stopPropagation()}
-              />
-            </div>
-          </div>
+        {searchable && searchPosition === "anchor" && (
+          <SelectSearch
+            ref={searchRef}
+            value={searchTerm}
+            iconSearch={iconSearch}
+            onChange={handleChangeSearch}
+            position="dropdown"
+          />
         )}
-      
-        <div className="max-h-60 overflow-auto">
-          {filteredOptions.map((option) => (
-            <div
-              key={option.value}
-              className={`
-                flex items-center gap-2 p-2 cursor-pointer
-                ${option.disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}
-                ${currentValue.includes(option.value) ? 'bg-blue-50' : ''}
-              `}
-              onClick={handleClickOption(option)}
-            >
-              {showCheckbox && (
-                <div className="flex items-center justify-center w-4 h-4 border rounded">
-                  {currentValue.includes(option.value)
-                    ? iconCheck || <Check className="w-3 h-3 text-blue-500" />
-                    : iconUncheck
-                  }
-                </div>
-              )}
-              <span>{option.label}</span>
-            </div>
-          ))}
-        </div>
+        <SelectMenu
+          options={filteredOptions}
+          value={currentValue}
+          showCheckbox={showCheckbox}
+          iconCheck={iconCheck}
+          iconUncheck={iconUncheck}
+          onSelect={handleSelect}
+        />
       </>
     );
 
     return (
       <>
-        <div ref={containerRef} className={className}>
-          <Wrapper>
-            <div
-              className={clsx(
-                "flex items-center justify-between w-full p-2 border rounded cursor-pointer overflow-hidden text-sm",
-                "hover:border-blue-500"
-              )}
-              onClick={handleClickAnchor}
-            >
-              <div className={clsx("flex-1 min-w-0", truncate ? "truncate" : "")}>
-                {anchorValue}
-              </div>
-              {separator && <div className="w-px h-4 bg-gray-200" />}
-              {iconDropdown || (
-                <span className="flex h-full px-2 -mr-2">
-                  <ChevronDown
-                    className={`w-4 h-4 transition-transform ${
-                      isOpen ? 'transform rotate-180' : ''
-                    }`}
-                  />
-                </span>
-              )}
-            </div>
-          </Wrapper>
-        </div>
+        <SelectAnchor
+          ref={containerRef}
+          className={className}
+          opened={isOpen}
+          separator={separator}
+          iconDropdown={iconDropdown}
+          wrapper={wrapper}
+          onClick={handleClickAnchor}
+        >
+          <SelectValue
+            {...{
+              options: currentOptions,
+              value: currentValue,
+              placeholder,
+              chip,
+              displayCount,
+              multiple,
+              truncate,
+              iconRemove,
+              searchable,
+              searchPosition,
+              search: searchTerm,
+              opened: isOpen,
+              removable,
+              searchRef,
+              renderValue,
+              renderChip,
+              onRemove: handleRemoveValue,
+              setSearchTerm,
+              setShouldFilter,
+            }}
+          />
+        </SelectAnchor>
         {asModal && isSmallScreen
           ? (
             <SelectModal

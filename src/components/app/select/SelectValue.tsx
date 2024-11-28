@@ -1,47 +1,48 @@
 import { ChangeEvent, Fragment, MouseEvent, ReactNode, RefObject } from "react";
-import { SelectOption, SelectPrimitive, SelectRenderValueParams } from "./types";
+import { SelectItem, SelectPrimitive, SelectRenderValueParams } from "./types";
+import { SelectSearch } from "./SelectSearch";
 import { defaultRenderValue } from "./utils";
 import { X } from "lucide-react";
 import clsx from "clsx";
 
-export interface RenderSelected {
-  options: SelectOption[];
-  currentValue: SelectPrimitive[];
+export interface SelectValueProps {
+  options: SelectItem<SelectPrimitive>[];
+  value: SelectPrimitive[];
+  searchable?: boolean;
+  search?: string;
+  searchRef?: RefObject<HTMLInputElement>;
   placeholder?: string;
+  searchPosition?: "anchor" | "dropdown";
+  opened?: boolean;
+  displayCount?: number;
   chip?: boolean;
-  displayCount: number;
   multiple?: boolean;
   truncate?: boolean;
-  iconRemove?: ReactNode;
-  searchTerm?: string;
-  searchable?: boolean;
-  searchPosition?: "anchor" | "dropdown";
-  isOpen?: boolean;
   removable?: boolean;
-  searchRef?: RefObject<HTMLInputElement>;
+  iconRemove?: ReactNode;
   setSearchTerm(value: string): void;
   setShouldFilter(value: boolean): void;
-  renderChip?(option: SelectOption | number): JSX.Element;
-  renderValue?(option: SelectOption, params: SelectRenderValueParams): ReactNode;
-  onRemove(option: SelectOption): (e: MouseEvent) => void;
+  onRemove(option: SelectItem<SelectPrimitive>): void;
+  renderValue?(option: SelectItem<SelectPrimitive>, params: SelectRenderValueParams): ReactNode;
+  renderChip?(option: SelectItem<SelectPrimitive> | number): JSX.Element;
 }
 
-export function renderSelected(props: RenderSelected) {
+export function SelectValue(props: SelectValueProps) {
   const {
+    searchable,
     options,
-    currentValue,
+    value,
+    search,
+    searchRef,
     placeholder = "",
-    chip,
+    searchPosition,
+    opened,
     displayCount = 0,
+    chip,
     multiple = false,
     truncate,
-    iconRemove,
-    searchTerm,
-    searchable,
-    searchPosition = "anchor",
-    isOpen,
     removable = true,
-    searchRef,
+    iconRemove,
     setSearchTerm,
     setShouldFilter,
     renderValue = defaultRenderValue,
@@ -49,35 +50,33 @@ export function renderSelected(props: RenderSelected) {
     onRemove,
   } = props;
 
-  const selectedOptions = options.filter((opt) => currentValue.includes(opt.value));
+  const selected = options.filter((opt) => value.includes(opt.value!));
+
   const handleChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setShouldFilter(true);
     setSearchTerm(e.target.value);
   };
 
-  if (!searchable && !selectedOptions.length && !searchTerm) {
+  if (!searchable && !selected.length && !search) {
     return (
       <span className="opacity-80">{placeholder}</span>
     );
   }
 
-  if (searchable && searchPosition === "anchor" && isOpen) {
+  if (searchable && searchPosition === "anchor" && opened) {
     return (
-      <div className="flex items-center flex-1 h-full">
-        <input
-          ref={searchRef}
-          type="text"
-          className="w-full h-full bg-transparent focus:outline-none"
-          placeholder={placeholder}
-          value={searchTerm}
-          onChange={handleChangeSearch}
-        />
-      </div>
+      <SelectSearch
+        ref={searchRef}
+        placeholder={placeholder}
+        value={search || ""}
+        onChange={handleChangeSearch}
+        position="anchor"
+      />
     );
   }
 
-  const displayOptions = displayCount > 0 ? selectedOptions.slice(0, displayCount) : selectedOptions;
-  const remaining = selectedOptions.length - displayOptions.length;
+  const displayOptions = displayCount > 0 ? selected.slice(0, displayCount) : selected;
+  const remaining = selected.length - displayOptions.length;
 
   if (!chip) {
     return (
@@ -96,6 +95,12 @@ export function renderSelected(props: RenderSelected) {
         )}
       </>
     );
+  }
+
+  const handleRemove = (option: SelectItem<SelectPrimitive>) => (e: MouseEvent<HTMLSpanElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onRemove(option);
   }
 
   return (
@@ -119,7 +124,7 @@ export function renderSelected(props: RenderSelected) {
           >
             <span className={truncate ? "truncate" : ""}>{option?.label}</span>
             {removable && (
-              <span className="-mr-2 px-1 h-full inline-flex items-center" onClick={onRemove(option)}>
+              <span className="-mr-2 px-1 h-full inline-flex items-center" onClick={handleRemove(option)}>
                 {iconRemove || <X className="w-3 h-3 cursor-pointer hover:text-red-500" />}
               </span>
             )}
@@ -135,4 +140,4 @@ export function renderSelected(props: RenderSelected) {
       )}
     </div>
   );
-};
+}

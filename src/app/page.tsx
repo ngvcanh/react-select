@@ -4,34 +4,62 @@ import { Card } from "@/components/app/card";
 import { Section } from "@/components/app/section";
 import { Select } from "@/components/app/select";
 
-const options = [
- { value: "javascript", label: "JavaScript" },
-  { value: "typescript", label: "TypeScript" },
-  { value: "python", label: "Python" },
-  { value: "ruby", label: "Ruby" },
-  { value: "java", label: "Java" },
-  { value: "csharp", label: "C#" },
-  { value: "golang", label: "Go" },
-  { value: "rust", label: "Rust" },
-  { value: "kotlin", label: "Kotlin" },
-  { value: "swift", label: "Swift" },
-  { value: "php", label: "PHP" },
-  { value: "scala", label: "Scala" },
-  { value: "elixir", label: "Elixir" },
-  { value: "haskell", label: "Haskell" },
-  { value: "clojure", label: "Clojure" },
-  { value: "perl", label: "Perl" },
-  { value: "r", label: "R" },
-  { value: "shell", label: "Shell" },
-  { value: "sql", label: "SQL" },
-  { value: "css", label: "CSS" },
-  { value: "html", label: "HTML" },
-  { value: "json", label: "JSON" },
-  { value: "xml", label: "XML" },
-  { value: "yaml", label: "YAML" },
-  { value: "markdown", label: "Markdown" },
-  { value: "dockerfile", label: "Dockerfile" },
+const allOptions = [
+  { value: 1, label: "Apple" },
+  { value: 2, label: "Banana" },
+  { value: 3, label: "Orange" },
+  { value: "fruits", label: "Fruits", group: true },
+  { value: 4, label: "Mango" },
+  { value: 5, label: "Grape" },
+  { value: 6, label: "Watermelon" },
+  { value: "vegetables", label: "Vegetables", group: true },
+  { value: 7, label: "Carrot" },
+  { value: 8, label: "Broccoli" }, 
+  { value: 9, label: "Cucumber" },
+  { value: "meat", label: "Meat", group: true },
+  { value: 10, label: "Beef" },
+  { value: 11, label: "Pork" },
+  { value: 12, label: "Chicken" },
+  { value: "seafood", label: "Seafood", group: true },
+  { value: 13, label: "Fish" },
+  { value: 14, label: "Shrimp" },
+  { value: 15, label: "Crab" },
+  { value: "dairy", label: "Dairy Products", group: true },
+  { value: 16, label: "Milk" },
+  { value: 17, label: "Cheese" },
+  { value: 18, label: "Yogurt" },
+  { value: "grains", label: "Grains", group: true },
+  { value: 19, label: "Rice" },
+  { value: 20, label: "Wheat" },
+  { value: 21, label: "Oats" },
+  { value: "beverages", label: "Beverages", group: true },
+  { value: 22, label: "Coffee" },
+  { value: 23, label: "Tea" },
+  { value: 24, label: "Juice" },
+  { value: "snacks", label: "Snacks", group: true },
+  { value: 25, label: "Chips" },
+  { value: 26, label: "Nuts" },
+  { value: 27, label: "Cookies" },
+  { value: "condiments", label: "Condiments", group: true },
+  { value: 28, label: "Salt" },
+  { value: 29, label: "Pepper" },
+  { value: 30, label: "Sugar" },
+  { value: "herbs", label: "Herbs & Spices", group: true },
+  { value: 31, label: "Basil" },
+  { value: 32, label: "Thyme" },
+  { value: 33, label: "Oregano" },
+  ...Array.from({ length: 100 }, (_, i) => ({
+    value: i + 34,
+    label: `Item ${i + 34}`
+  }))
 ];
+
+const options = allOptions.slice(0, 25);
+
+const otherOptions = options.map((option) => {
+  const { value, label, ...rest } = option;
+  return { ...rest, id: value, name: label };
+})
 
 export default function Home() {
   return (
@@ -188,6 +216,17 @@ export default function Home() {
             placeholder="Select option"
             breakpoint={500}
             asModal
+          />
+        </Card>
+      </Section>
+      <Section title="Group">
+        <Card title="Custom [getOptionValue][getOptionLabel]">
+          <Select
+            options={otherOptions}
+            placeholder="Select option"
+            asModal
+            getOptionValue={(item) => item.id as string}
+            getOptionLabel={(item) => item.name as string}
           />
         </Card>
       </Section>
