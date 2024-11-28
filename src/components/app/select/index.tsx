@@ -51,6 +51,8 @@ export interface SelectProps {
   backdrop?: "static" | "closeable";
   modalWidth?: SelectPrimitive;
   asChild?: boolean;
+  splitColumns?: boolean;
+  triggerColumn?: "hover" | "selected";
   isGroup?(item: SelectItem): item is SelectItemGroup;
   getOptionValue?(item: SelectItem): SelectPrimitive;
   getOptionLabel?(item: SelectItem): SelectPrimitive;
@@ -93,6 +95,7 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
       backdrop,
       modalWidth,
       asChild,
+      splitColumns,
       isGroup,
       getOptionValue,
       getOptionLabel,
@@ -195,6 +198,7 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
           showCheckbox={showCheckbox}
           iconCheck={iconCheck}
           iconUncheck={iconUncheck}
+          splitColumns={splitColumns}
           onSelect={handleSelect}
         />
       </>

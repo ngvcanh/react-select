@@ -9,11 +9,15 @@ export interface SelectOptionProps {
   showCheckbox?: boolean;
   iconCheck?: ReactNode;
   iconUncheck?: ReactNode;
+  splitColumns?: boolean;
+  tiggerColumn?: "hover" | "selected";
+  isLeft?: boolean;
   onSelect(option: SelectItem<SelectPrimitive>): void;
+  onTrigger?(option: SelectItem<SelectPrimitive>): void;
 }
 
 export function SelectOption(props: SelectOptionProps) {
-  const { option, value, showCheckbox, iconCheck, iconUncheck, onSelect } = props;
+  const { option, value, showCheckbox, iconCheck, iconUncheck, splitColumns, tiggerColumn, onSelect, onTrigger } = props;
 
   const handleClickOption = (option: SelectItem<SelectPrimitive>) => () => {
     if (option.disabled || option.group) {
@@ -22,6 +26,14 @@ export function SelectOption(props: SelectOptionProps) {
 
     onSelect(option);
   }
+
+  const handleMouseOver = () => {
+    if (!splitColumns || tiggerColumn !== "hover") {
+      return;
+    }
+
+    onTrigger?.(option);
+  };
 
   const selected = !option.group && value.includes(option.value!);
 
@@ -38,6 +50,7 @@ export function SelectOption(props: SelectOptionProps) {
           }
         )}
         onClick={handleClickOption(option)}
+        onMouseOver={handleMouseOver}
       >
         {showCheckbox && (
           <div className="flex items-center justify-center w-4 h-4 border rounded">
@@ -49,7 +62,7 @@ export function SelectOption(props: SelectOptionProps) {
         )}
         <span>{option.label}</span>
       </div>
-      {option.group && !!option.children?.length && (
+      {option.group && !!option.children?.length && !splitColumns && (
         option.children.map((child: SelectItemOption) => (
           <Fragment key={child.value as SelectPrimitive}>
             <SelectOption
