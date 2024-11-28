@@ -1,6 +1,6 @@
 import { Fragment, ReactNode } from "react";
 import { SelectItem, SelectItemOption, SelectPrimitive } from "./types";
-import { Check } from "lucide-react";
+import { Check, ChevronRight } from "lucide-react";
 import clsx from "clsx";
 
 export interface SelectOptionProps {
@@ -9,15 +9,28 @@ export interface SelectOptionProps {
   showCheckbox?: boolean;
   iconCheck?: ReactNode;
   iconUncheck?: ReactNode;
+  iconGroup?: ReactNode;
   splitColumns?: boolean;
-  tiggerColumn?: "hover" | "selected";
+  triggerColumn?: "hover" | "selected";
   isLeft?: boolean;
   onSelect(option: SelectItem<SelectPrimitive>): void;
-  onTrigger?(option: SelectItem<SelectPrimitive>): void;
+  onTrigger?(option: SelectItem<SelectPrimitive> | null): void;
 }
 
 export function SelectOption(props: SelectOptionProps) {
-  const { option, value, showCheckbox, iconCheck, iconUncheck, splitColumns, tiggerColumn, onSelect, onTrigger } = props;
+  const {
+    option,
+    value,
+    showCheckbox,
+    iconCheck,
+    iconUncheck,
+    splitColumns,
+    triggerColumn = "hover",
+    isLeft,
+    iconGroup,
+    onSelect,
+    onTrigger
+  } = props;
 
   const handleClickOption = (option: SelectItem<SelectPrimitive>) => () => {
     if (option.disabled || option.group) {
@@ -28,11 +41,11 @@ export function SelectOption(props: SelectOptionProps) {
   }
 
   const handleMouseOver = () => {
-    if (!splitColumns || tiggerColumn !== "hover") {
+    if (!splitColumns || triggerColumn !== "hover" || !isLeft) {
       return;
     }
 
-    onTrigger?.(option);
+    onTrigger?.(option.group ? option : null);
   };
 
   const selected = !option.group && value.includes(option.value!);
@@ -45,7 +58,7 @@ export function SelectOption(props: SelectOptionProps) {
           {
             "opacity-50 cursor-not-allowed": option.disabled,
             "hover:bg-gray-100": !option.disabled && !option.group,
-            "bg-gray-200": option.group,
+            "bg-gray-200": option.group && !splitColumns,
             "bg-blue-50": selected,
           }
         )}
@@ -60,7 +73,12 @@ export function SelectOption(props: SelectOptionProps) {
             }
           </div>
         )}
-        <span>{option.label}</span>
+        <span className="flex-grow">{option.label}</span>
+        {iconGroup !== null && option.group && (
+          <span className="inline-flex h-full items-center px-2">
+            {iconGroup ?? <ChevronRight className="w-4 h-4" />}
+          </span>
+        )}
       </div>
       {option.group && !!option.children?.length && !splitColumns && (
         option.children.map((child: SelectItemOption) => (

@@ -1,17 +1,20 @@
 import { forwardRef, PropsWithChildren, RefObject, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { SelectPortal } from "./SelectPortal";
 import { SelectPortalRef, SelectPrimitive } from "./types";
+import { calcDropdownWidth } from "./utils";
 
 export interface SelectDropdownProps {
   anchorRef: RefObject<HTMLDivElement>;
   offset?: number;
   maxHeight?: SelectPrimitive;
+  splitColumns?: boolean;
+  menuWidth?: SelectPrimitive;
   onClose?(): void;
 }
 
 export const SelectDropdown = forwardRef<SelectPortalRef, PropsWithChildren<SelectDropdownProps>>(
   function SelectDropdown(props, ref) {
-    const { offset = 4, anchorRef, maxHeight, onClose, children } = props;
+    const { offset = 4, anchorRef, maxHeight, splitColumns, menuWidth, children, onClose } = props;
 
     const [isOpen, setIsOpen] = useState(false);
 
@@ -37,8 +40,13 @@ export const SelectDropdown = forwardRef<SelectPortalRef, PropsWithChildren<Sele
 
         const topOfDropdown = containerRect.bottom + offset;
         const dropdownHeight = dropdownRect.height;
+        const ratio = splitColumns ? 2 : 1;
 
-        dropdownRef.current.style.width = `${containerRect.width}px`;
+        const w = calcDropdownWidth(menuWidth, ratio);
+        const rectWidth = containerRect.width * ratio;
+        const dropdownWidth = w ? w === "auto" ? rectWidth : w : rectWidth;
+
+        dropdownRef.current.style.width = `${dropdownWidth}px`;
         dropdownRef.current.style.left = `${containerRect.left}px`;
 
         if (
@@ -81,7 +89,7 @@ export const SelectDropdown = forwardRef<SelectPortalRef, PropsWithChildren<Sele
         window.removeEventListener("resize", updatePosition);
         window.removeEventListener("scroll", updatePosition);
       };
-    }, [isOpen, offset, anchorRef]);
+    }, [isOpen, offset, anchorRef, splitColumns, menuWidth]);
 
     useEffect(() => {
       if (typeof document === "undefined") {

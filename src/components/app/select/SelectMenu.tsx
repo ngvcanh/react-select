@@ -1,6 +1,7 @@
-import { ReactNode } from "react";
-import { SelectItem, SelectPrimitive } from "./types";
+import { ReactNode, useState } from "react";
+import { SelectItem, SelectItemGroup, SelectPrimitive } from "./types";
 import { SelectList } from "./SelectList";
+import clsx from "clsx";
 
 export interface SelectMenuProps {
   options: SelectItem<SelectPrimitive>[];
@@ -8,14 +9,29 @@ export interface SelectMenuProps {
   showCheckbox?: boolean;
   iconCheck?: ReactNode;
   iconUncheck?: ReactNode;
+  iconGroup?: ReactNode;
   splitColumns?: boolean;
   onSelect(option: SelectItem<SelectPrimitive>): void;
 }
 
 export function SelectMenu(props: SelectMenuProps) {
+  const { splitColumns } = props;
+  const [hovered, setHovered] = useState<SelectItemGroup<SelectPrimitive> | null>(null);
+
+  const handleTrigger = (option: SelectItemGroup<SelectPrimitive> | null) => {
+    setHovered(option);
+  };
+
   return (
-    <>
-      <SelectList {...props} isLeft />
-    </>
+    <div className={clsx("w-full", splitColumns ? "flex" : "")}>
+      <SelectList {...props} isLeft onTrigger={handleTrigger} />
+      {splitColumns && (
+        <div className="flex-grow w-full">
+          {!!hovered && (
+            <SelectList {...props} options={hovered.children as SelectItem<SelectPrimitive>[]} />
+          )}
+        </div>
+      )}
+    </div>
   );
 }

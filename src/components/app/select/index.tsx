@@ -53,6 +53,8 @@ export interface SelectProps {
   asChild?: boolean;
   splitColumns?: boolean;
   triggerColumn?: "hover" | "selected";
+  menuWidth?: SelectPrimitive;
+  iconGroup?: ReactNode;
   isGroup?(item: SelectItem): item is SelectItemGroup;
   getOptionValue?(item: SelectItem): SelectPrimitive;
   getOptionLabel?(item: SelectItem): SelectPrimitive;
@@ -96,6 +98,8 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
       modalWidth,
       asChild,
       splitColumns,
+      menuWidth,
+      iconGroup,
       isGroup,
       getOptionValue,
       getOptionLabel,
@@ -198,6 +202,7 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
           showCheckbox={showCheckbox}
           iconCheck={iconCheck}
           iconUncheck={iconUncheck}
+          iconGroup={iconGroup}
           splitColumns={splitColumns}
           onSelect={handleSelect}
         />
@@ -256,6 +261,8 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
               anchorRef={containerRef}
               offset={offset}
               maxHeight={maxHeight}
+              splitColumns={splitColumns}
+              menuWidth={menuWidth}
               onClose={handleClosePortal}
             >
               {dropdownContent}

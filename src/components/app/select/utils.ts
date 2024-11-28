@@ -101,3 +101,23 @@ export function normalizeOptions(props: SelectNormalizedOptions): SelectItem<Sel
 
   return result as SelectItem<SelectPrimitive>[];
 }
+
+export function calcDropdownWidth(menuWidth: SelectPrimitive | undefined, ratio: number) {
+  if (typeof menuWidth === "undefined") {
+    return undefined;
+  }
+
+  if (typeof menuWidth === "number") {
+    return `${menuWidth * ratio}px`;
+  }
+
+  if (menuWidth.endsWith("px")) {
+    return +menuWidth.replace("px", "") * ratio + "px";
+  }
+
+  if (menuWidth.endsWith("%")) {
+    return +menuWidth.replace("%", "") * ratio + "%";
+  }
+
+  return menuWidth;
+}

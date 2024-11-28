@@ -229,6 +229,13 @@ export default function Home() {
             getOptionLabel={(item) => item.name as string}
           />
         </Card>
+        <Card title="Custom [splitColumns=true]">
+          <Select
+            options={options}
+            placeholder="Select option"
+            splitColumns
+          />
+        </Card>
       </Section>
     </div>
   );
