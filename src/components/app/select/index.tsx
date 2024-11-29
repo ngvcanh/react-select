@@ -83,6 +83,7 @@ export interface SelectProps {
       responsive: boolean;
     }>;
   };
+  autoFit?: boolean;
   isGroup?(item: SelectItem): item is SelectItemGroup;
   getOptionValue?(item: SelectItem): SelectPrimitive;
   getOptionLabel?(item: SelectItem): SelectPrimitive;
@@ -126,8 +127,8 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       splitColumns,
       menuWidth,
       iconGroup,
-      debug,
       components = {},
+      autoFit,
       isGroup,
       getOptionValue,
       getOptionLabel,
@@ -243,9 +244,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       setSearchTerm(e.target.value);
       setShouldFilter(true);
     };
-    if(debug) {
-      console.log("search", props);
-    }
+
     const dropdownContent = (
       <>
         {components.header ? (
@@ -350,6 +349,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
               maxHeight={maxHeight}
               splitColumns={splitColumns}
               menuWidth={menuWidth}
+              autoFit={autoFit}
               onClose={handleClosePortal}
             >
               {dropdownContent}

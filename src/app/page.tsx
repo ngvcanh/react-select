@@ -83,7 +83,7 @@ export default function Home() {
         </Card>
       </Section>
       <Section title="Multiple">
-      <Card title="Multiple [keepOnSelect=true|default]">
+        <Card title="Multiple [keepOnSelect=true|default]">
           <Select
             options={options}
             multiple
@@ -164,6 +164,8 @@ export default function Home() {
             multiple
             chip
             removable={false}
+            debug
+            maxHeight="50dvh"
             placeholder="Select option"
           />
         </Card>
@@ -181,7 +183,6 @@ export default function Home() {
             options={options}
             searchable
             searchPosition="dropdown"
-            debug
             placeholder="Search..."
           />
         </Card>
