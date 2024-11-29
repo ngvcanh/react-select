@@ -1,6 +1,6 @@
 import { Fragment, ReactNode } from "react";
 import { SelectItem, SelectItemOption, SelectPrimitive } from "./types";
-import { Check, ChevronRight } from "lucide-react";
+import { Check, ChevronDown, ChevronRight } from "lucide-react";
 import clsx from "clsx";
 
 export interface SelectOptionProps {
@@ -49,6 +49,7 @@ export function SelectOption(props: SelectOptionProps) {
   };
 
   const selected = !option.group && value.includes(option.value!);
+  const GroupRightIcon = splitColumns ? ChevronRight : ChevronDown;
 
   return (
     <>
@@ -75,8 +76,8 @@ export function SelectOption(props: SelectOptionProps) {
         )}
         <span className="flex-grow">{option.label}</span>
         {iconGroup !== null && option.group && (
-          <span className="inline-flex h-full items-center px-2">
-            {iconGroup ?? <ChevronRight className="w-4 h-4" />}
+          <span className="inline-flex h-full items-center px-2 -mr-2">
+            {iconGroup ?? <GroupRightIcon className="w-4 h-4" />}
           </span>
         )}
       </div>

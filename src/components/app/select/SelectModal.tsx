@@ -147,7 +147,11 @@ export const SelectModal = forwardRef<SelectPortalRef, PropsWithChildren<SelectM
         <div className={clsx("fixed inset-0 overflow-hidden flex items-center justify-center", classNames.portal)}>
           <div
             ref={backdropRef}
-            className={clsx("fixed inset-0 bg-black/40", Animated.backdrop.close, classNames.backdrop)}
+            className={clsx(
+              "fixed inset-0 bg-black/40 transition-opacity duration-300",
+              Animated.backdrop.close,
+              classNames.backdrop
+            )}
             onClick={handleClickBackdrop}
           />
           <div

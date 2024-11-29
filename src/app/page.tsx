@@ -192,7 +192,7 @@ export default function Home() {
             placeholder="Search..."
           />
         </Card>
-        <Card title='Multiple [searchPosition="dropdown"|]'>
+        <Card title='Multiple [searchPosition="dropdown"]'>
           <Select
             options={options}
             searchable
