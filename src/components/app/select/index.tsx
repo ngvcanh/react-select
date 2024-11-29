@@ -55,6 +55,7 @@ export interface SelectProps {
   triggerColumn?: "hover" | "selected";
   menuWidth?: SelectPrimitive;
   iconGroup?: ReactNode;
+  debug?: boolean;
   isGroup?(item: SelectItem): item is SelectItemGroup;
   getOptionValue?(item: SelectItem): SelectPrimitive;
   getOptionLabel?(item: SelectItem): SelectPrimitive;
@@ -100,6 +101,7 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
       splitColumns,
       menuWidth,
       iconGroup,
+      debug,
       isGroup,
       getOptionValue,
       getOptionLabel,
@@ -184,10 +186,12 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
       setSearchTerm(e.target.value);
       setShouldFilter(true);
     };
-
+    if(debug) {
+      console.log("search", props);
+    }
     const dropdownContent = (
       <>
-        {searchable && searchPosition === "anchor" && (
+        {searchable && searchPosition === "dropdown" && (
           <SelectSearch
             ref={searchRef}
             value={searchTerm}

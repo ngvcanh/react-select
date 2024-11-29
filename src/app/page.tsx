@@ -181,6 +181,7 @@ export default function Home() {
             options={options}
             searchable
             searchPosition="dropdown"
+            debug
             placeholder="Search..."
           />
         </Card>
