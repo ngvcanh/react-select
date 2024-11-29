@@ -3,12 +3,12 @@ import { SelectPortalRef, SelectPrimitive } from "./types";
 import { SelectDialog } from "./SelectDialog";
 import clsx from "clsx";
 
-export interface SelectModalProps {
+export interface SelectSheetProps {
   opened?: boolean;
-  width?: SelectPrimitive;
   maxHeight?: SelectPrimitive;
-  className?: string;
+  menuHeight?: SelectPrimitive;
   backdrop?: "static" | "closeable";
+  className?: string;
   classNames?: {
     portal?: string;
     backdrop?: string;
@@ -22,40 +22,30 @@ const Animated = {
     close: ["opacity-0"],
   },
   body: {
-    open: ["opacity-100", "scale-100"],
-    close: ["opacity-0", "scale-90"],
+    open: ["translate-y-0"],
+    close: ["translate-y-full"],
   },
 };
 
-export const SelectModal = forwardRef<SelectPortalRef, PropsWithChildren<SelectModalProps>>(
-  function SelectModal(props, ref) {
-    const {
-      opened,
-      width = 500,
-      maxHeight,
-      className,
-      classNames = {},
-      children,
-      backdrop,
-      onClose
-    } = props;
+export const SelectSheet = forwardRef<SelectPortalRef, PropsWithChildren<SelectSheetProps>>(
+  function SelectSheet(props, ref) {
+    const { opened, maxHeight, menuHeight, children, backdrop = "closeable", className, classNames = {}, onClose } = props;
 
     return (
       <SelectDialog
         ref={ref}
         opened={opened}
-        onClose={onClose}
         animation={Animated}
-        className={clsx("rounded-lg", className)}
         backdrop={backdrop}
-        maxHeight={maxHeight}
+        onClose={onClose}
+        className={clsx("rounded-t-lg w-full", className)}
         classNames={{
           ...classNames,
-          portal: clsx("flex items-center justify-center", classNames.portal)
+          portal: clsx("flex items-end", classNames.portal)
         }}
+        maxHeight={maxHeight}
         style={{
-          width,
-          maxWidth: "100dvw",
+          height: menuHeight,
         }}
       >
         {children}

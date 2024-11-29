@@ -33,7 +33,7 @@ export function SelectList(props: SelectListProps) {
   } = props;
 
   return (
-    <div className={clsx("max-h-60 overflow-auto", splitColumns && "flex-grow w-full")}>
+    <div className={clsx("overflow-auto", splitColumns && "flex-grow w-full")}>
       {options.map((option) => (
         <SelectOption
           key={option.value}

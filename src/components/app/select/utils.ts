@@ -6,7 +6,12 @@ export function defaultRenderValue(option: SelectItem, params: SelectRenderValue
   return option?.label + (multiple && !isLast ? ", " : "");
 }
 
-export function createEvent(name: string | undefined, value: SelectPrimitive | SelectPrimitive[]) {
+export function createEvent(
+  name: string | undefined,
+  values: SelectPrimitive[],
+  multiple: boolean | undefined
+) {
+  const value = multiple ? values : (values[0] ?? null);
   return {
     target: { name, value },
     currentTarget: { name, value }

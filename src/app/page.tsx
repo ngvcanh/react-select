@@ -204,19 +204,28 @@ export default function Home() {
         </Card>
       </Section>
       <Section title="Responsive">
-        <Card title="Modal mobile [asModal=true]">
+        <Card title="Modal mobile [responsiveType=modal]">
           <Select
             options={options}
             placeholder="Select option"
-            asModal
+            responsiveType="modal"
+            maxHeight="50dvh"
           />
         </Card>
-        <Card title="Modal mobile [asModal=true][breakpoint=500]">
+        <Card title="Modal mobile [responsiveType=modal][breakpoint=500]">
           <Select
             options={options}
             placeholder="Select option"
             breakpoint={500}
-            asModal
+            responsiveType="modal"
+          />
+        </Card>
+        <Card title="Modal mobile [responsiveType=sheet]">
+          <Select
+            options={options}
+            placeholder="Select option"
+            responsiveType="sheet"
+            maxHeight="50dvh"
           />
         </Card>
       </Section>
@@ -225,7 +234,7 @@ export default function Home() {
           <Select
             options={otherOptions}
             placeholder="Select option"
-            asModal
+            responsiveType="modal"
             getOptionValue={(item) => item.id as string}
             getOptionLabel={(item) => item.name as string}
           />

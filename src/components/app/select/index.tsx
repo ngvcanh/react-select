@@ -6,6 +6,7 @@ import {
   SyntheticEvent,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState
@@ -19,6 +20,20 @@ import { SelectSearch } from "./SelectSearch";
 import { SelectMenu } from "./SelectMenu";
 import { SelectAnchor } from "./SelectAnchor";
 import { SelectValue } from "./SelectValue";
+import { SelectSheet } from "./SelectSheet";
+
+export interface SelectRef {
+  anchor: HTMLDivElement | null;
+  search: HTMLInputElement | null;
+  opened: boolean;
+  focus(): void;
+  blur(): void;
+  open(): void;
+  close(): void;
+  clear(): void;
+  getValue(): SelectPrimitive | SelectPrimitive[] | null;
+  setValue(value: SelectPrimitive | SelectPrimitive[]): void;
+}
 
 export interface SelectProps {
   name?: string;
@@ -47,7 +62,7 @@ export interface SelectProps {
   maxHeight?: SelectPrimitive;
   breakpoint?: Breakpoint;
   breakpoints?: Partial<Breakpoints>;
-  asModal?: boolean;
+  responsiveType?: "modal" | "sheet";
   backdrop?: "static" | "closeable";
   modalWidth?: SelectPrimitive;
   asChild?: boolean;
@@ -64,8 +79,7 @@ export interface SelectProps {
   onChange?(e: SyntheticEvent): void;
 }
 
-export const Select = forwardRef<HTMLInputElement, SelectProps>(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const Select = forwardRef<SelectRef, SelectProps>(
   function Select(props, ref) {
     const {
       name,
@@ -94,7 +108,7 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
       maxHeight,
       breakpoint = "md",
       breakpoints,
-      asModal,
+      responsiveType,
       backdrop,
       modalWidth,
       asChild,
@@ -155,6 +169,37 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
       setIsOpen(false);
     }, []);
 
+    useImperativeHandle(ref, () => ({
+      anchor: containerRef.current,
+      search: searchRef.current,
+      opened: isOpen,
+      focus: () => containerRef.current?.click(),
+      blur: () => handleClosePortal(),
+      open: () => setIsOpen(true),
+      close: () => handleClosePortal(),
+      clear: () => {
+        setCurrentValue([]);
+        setSearchTerm("");
+        setShouldFilter(false);
+        onChange?.(createEvent(name, [], multiple));
+      },
+      getValue: () => {
+        return multiple ? currentValue : (currentValue[0] || null); 
+      },
+      setValue: (value) => {
+        const nextValue = normalizeValue(value);
+        setCurrentValue(nextValue);
+        onChange?.(createEvent(name, nextValue, multiple));
+      },
+    }), [
+      currentValue,
+      name,
+      onChange,
+      handleClosePortal,
+      isOpen,
+      multiple,
+    ]);
+
     const filteredOptions = currentOptions.filter((option) =>
       !shouldFilter || option.label?.toString().toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -173,11 +218,11 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
     const handleSelect = (option: SelectItem<SelectPrimitive>) => {
       if (multiple) {
         setCurrentValue((prev) => toggleValue(option.value!, prev, maxSelect));
-        onChange?.(createEvent(name, toggleValue(option.value!, currentValue, maxSelect)));
+        onChange?.(createEvent(name, toggleValue(option.value!, currentValue, maxSelect), multiple));
         keepOnSelect || setIsOpen(false);
       } else {
         setCurrentValue([option.value!]);
-        onChange?.(createEvent(name, option.value!));
+        onChange?.(createEvent(name, [option.value!], multiple));
         handleClosePortal();
       }
     };
@@ -248,17 +293,29 @@ export const Select = forwardRef<HTMLInputElement, SelectProps>(
             }}
           />
         </SelectAnchor>
-        {asModal && isSmallScreen
+        {responsiveType && isSmallScreen
           ? (
-            <SelectModal
-              ref={portalRef}
-              width={modalWidth}
-              maxHeight={maxHeight}
-              backdrop={backdrop}
-              onClose={handleClosePortal}
-            >
-              {dropdownContent}
-            </SelectModal>
+            responsiveType === "sheet"
+              ? (
+                <SelectSheet
+                  ref={portalRef}
+                  maxHeight={maxHeight}
+                  backdrop={backdrop}
+                  onClose={handleClosePortal}
+                >
+                  {dropdownContent}
+                </SelectSheet>
+              ) : (
+                <SelectModal
+                  ref={portalRef}
+                  width={modalWidth}
+                  maxHeight={maxHeight}
+                  backdrop={backdrop}
+                  onClose={handleClosePortal}
+                >
+                  {dropdownContent}
+                </SelectModal>
+              )
           ) : (
             <SelectDropdown
               ref={portalRef}
