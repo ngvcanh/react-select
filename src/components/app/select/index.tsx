@@ -51,7 +51,6 @@ export interface SelectProps {
   offset?: number;
   keepOnSelect?: boolean;
   truncate?: boolean;
-  wrapper?: ComponentType;
   iconUncheck?: ReactNode;
   iconCheck?: ReactNode;
   iconDropdown?: ReactNode;
@@ -71,6 +70,19 @@ export interface SelectProps {
   menuWidth?: SelectPrimitive;
   iconGroup?: ReactNode;
   debug?: boolean;
+  components?: {
+    anchorWrapper?: ComponentType;
+    header?: ComponentType<{
+      currentValue: SelectPrimitive[];
+      search: string;
+      responsive: boolean;
+    }>;
+    footer?: ComponentType<{
+      currentValue: SelectPrimitive[];
+      search: string;
+      responsive: boolean;
+    }>;
+  };
   isGroup?(item: SelectItem): item is SelectItemGroup;
   getOptionValue?(item: SelectItem): SelectPrimitive;
   getOptionLabel?(item: SelectItem): SelectPrimitive;
@@ -88,7 +100,6 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       placeholder,
       className,
       chip,
-      wrapper,
       displayCount = 0,
       searchable,
       searchPosition = "anchor",
@@ -116,6 +127,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       menuWidth,
       iconGroup,
       debug,
+      components = {},
       isGroup,
       getOptionValue,
       getOptionLabel,
@@ -236,6 +248,13 @@ export const Select = forwardRef<SelectRef, SelectProps>(
     }
     const dropdownContent = (
       <>
+        {components.header ? (
+          <components.header {...{
+            currentValue,
+            search: searchTerm,
+            responsive: isSmallScreen,
+          }} />
+        ): null}
         {searchable && searchPosition === "dropdown" && (
           <SelectSearch
             ref={searchRef}
@@ -255,6 +274,13 @@ export const Select = forwardRef<SelectRef, SelectProps>(
           splitColumns={splitColumns}
           onSelect={handleSelect}
         />
+        {components.footer ? (
+          <components.footer {...{
+            currentValue,
+            search: searchTerm,
+            responsive: isSmallScreen,
+          }} />
+        ): null}
       </>
     );
 
@@ -266,7 +292,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
           opened={isOpen}
           separator={separator}
           iconDropdown={iconDropdown}
-          wrapper={wrapper}
+          wrapper={components.anchorWrapper}
           onClick={handleClickAnchor}
         >
           <SelectValue
