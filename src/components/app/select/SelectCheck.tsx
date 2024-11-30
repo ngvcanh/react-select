@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { SelectItemGroup, SelectPrimitive } from "./types";
+import { SelectItemOption, SelectPrimitive } from "./types";
 import { isEquals } from "./utils";
 
 type SelectCheckSize = "sm" | "md" | "lg";
@@ -7,13 +7,13 @@ type SelectCheckSize = "sm" | "md" | "lg";
 export interface SelectCheckProps {
   size?: SelectCheckSize;
   value: SelectPrimitive[];
-  group: SelectItemGroup<SelectPrimitive>;
+  options: SelectItemOption<SelectPrimitive>[];
 }
 
 const sizes = {
-  sm: "w-4 h-4",
-  md: "w-5 h-5",
-  lg: "w-6 h-6",
+  sm: "w-4 min-w-4 h-4",
+  md: "w-5 min-w-5 h-5",
+  lg: "w-6 min-w-6 h-6",
 }
 
 const beforeSizes = {
@@ -31,9 +31,9 @@ const beforeSizes = {
 };
 
 export function SelectCheck(props: SelectCheckProps) {
-  const { value, group, size = "md" } = props;
+  const { value, options, size = "md" } = props;
 
-  const members = (group.children?.map((child) => child.value) ?? []) as SelectPrimitive[];
+  const members = (options?.map((option) => option.value) ?? []) as SelectPrimitive[];
   const selected = members.filter((member) => value.includes(member as SelectPrimitive));
 
   const isCheckAll = members.length && isEquals(selected, members);

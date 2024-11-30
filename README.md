@@ -15,6 +15,7 @@
 - [x] ✅ Separator
 - [x] ✅ Max height dropdown
 - [x] ✅ Keep dropdown on select multiple
+- [x] ✅ Auto fit dropdown with screen space
 - [ ] ᠆ Virtual scroll for long list
 - [ ] ᠆ Loading state when fetch options
 - [ ] ᠆ Disabled for select

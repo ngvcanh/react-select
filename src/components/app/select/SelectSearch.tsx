@@ -29,7 +29,7 @@ export const SelectSearch = forwardRef<HTMLInputElement, SelectSearchProps>(
     }
 
     return (
-      <div className="p-2 border-b">
+      <div className="p-2 border-b sticky top-0 bg-white">
         <div className="flex items-center px-2 border rounded">
           {iconSearch || <Search className="w-4 h-4 text-gray-400" />}
           <input

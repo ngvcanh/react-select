@@ -108,7 +108,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       offset = 4,
       multiple,
       maxSelect = -1,
-      keepOnSelect = true,
+      keepOnSelect,
       truncate,
       iconCheck,
       iconUncheck,
@@ -229,15 +229,19 @@ export const Select = forwardRef<SelectRef, SelectProps>(
     };
 
     const handleSelect = (option: SelectItem<SelectPrimitive>) => {
+      let isKeep = false;
+
       if (multiple) {
+        isKeep = keepOnSelect ?? true;
         setCurrentValue((prev) => toggleValue(option.value!, prev, maxSelect));
         onChange?.(createEvent(name, toggleValue(option.value!, currentValue, maxSelect), multiple));
-        keepOnSelect || setIsOpen(false);
       } else {
+        isKeep = keepOnSelect ?? false;
         setCurrentValue([option.value!]);
         onChange?.(createEvent(name, [option.value!], multiple));
-        handleClosePortal();
       }
+
+      isKeep || handleClosePortal();
     };
 
     const handleChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {

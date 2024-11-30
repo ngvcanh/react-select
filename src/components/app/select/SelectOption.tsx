@@ -1,6 +1,7 @@
 import { Fragment, ReactNode } from "react";
-import { SelectItem, SelectItemOption, SelectPrimitive } from "./types";
-import { Check, ChevronDown, ChevronRight } from "lucide-react";
+import { SelectItem, SelectItemGroup, SelectItemOption, SelectPrimitive } from "./types";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { SelectCheck } from "./SelectCheck";
 import clsx from "clsx";
 
 export interface SelectOptionProps {
@@ -51,6 +52,8 @@ export function SelectOption(props: SelectOptionProps) {
   const selected = !option.group && value.includes(option.value!);
   const GroupRightIcon = splitColumns ? ChevronRight : ChevronDown;
 
+  
+
   return (
     <>
       <div
@@ -66,14 +69,16 @@ export function SelectOption(props: SelectOptionProps) {
         onClick={handleClickOption(option)}
         onMouseOver={handleMouseOver}
       >
-        {showCheckbox && (
-          <div className="flex items-center justify-center w-4 h-4 border rounded">
-            {selected
-              ? iconCheck || <Check className="w-3 h-3 text-blue-500" />
-              : iconUncheck
+        {showCheckbox || splitColumns ? (
+          <SelectCheck
+            value={value}
+            options={(option.group
+              ? (option as SelectItemGroup<SelectPrimitive>).children
+              : [option]) as SelectItemOption<SelectPrimitive>[]
             }
-          </div>
-        )}
+            size="md"
+          />
+        ) : null}
         <span className="flex-grow">{option.label}</span>
         {iconGroup !== null && option.group && (
           <span className="inline-flex h-full items-center px-2 -mr-2">

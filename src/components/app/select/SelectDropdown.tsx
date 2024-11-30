@@ -63,9 +63,12 @@ export const SelectDropdown = forwardRef<SelectPortalRef, PropsWithChildren<Sele
         const topOfDropdown = containerRect.bottom + offset;
         const ratio = splitColumns ? 2 : 1;
 
-        const dropdownHeight = maxHeight === undefined
-          ? dropdownRef.current.scrollHeight
-          : Math.min(dropdownRef.current.scrollHeight, dropdownRect.height);
+        const dropdownHeight = Math.min(
+          window.innerHeight - containerRect.height - offset,
+          maxHeight === undefined
+            ? dropdownRef.current.scrollHeight
+            : Math.min(dropdownRef.current.scrollHeight, dropdownRect.height)
+        );
         
 
         const w = calcDropdownWidth(menuWidth, ratio);
