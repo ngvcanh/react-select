@@ -59,7 +59,7 @@ const options = allOptions.slice(0, 25);
 const otherOptions = options.map((option) => {
   const { value, label, ...rest } = option;
   return { ...rest, id: value, name: label };
-})
+});
 
 export default function Home() {
   return (
@@ -205,7 +205,7 @@ export default function Home() {
         </Card>
       </Section>
       <Section title="Responsive">
-        <Card title="Modal mobile [responsiveType=modal]">
+        <Card title={`Modal mobile [responsiveType="modal"]`}>
           <Select
             options={options}
             placeholder="Select option"
@@ -213,7 +213,7 @@ export default function Home() {
             maxHeight="50dvh"
           />
         </Card>
-        <Card title="Modal mobile [responsiveType=modal][breakpoint=500]">
+        <Card title={`Modal mobile [responsiveType="modal"][breakpoint=500]`}>
           <Select
             options={options}
             placeholder="Select option"
@@ -221,7 +221,7 @@ export default function Home() {
             responsiveType="modal"
           />
         </Card>
-        <Card title="Modal mobile [responsiveType=sheet]">
+        <Card title={`Modal mobile [responsiveType="sheet"]`}>
           <Select
             options={options}
             placeholder="Select option"
@@ -240,11 +240,20 @@ export default function Home() {
             getOptionLabel={(item) => item.name as string}
           />
         </Card>
-        <Card title="Custom [splitColumns=true]">
+        <Card title={`Single [splitColumns=true][trigger="hover"|default]`}>
           <Select
             options={options}
             placeholder="Select option"
             splitColumns
+          />
+        </Card>
+        <Card title={`Multiple [splitColumns=true][keepOnSelect=true|default][trigger="hover"]`}>
+          <Select
+            options={options}
+            placeholder="Select option"
+            splitColumns
+            keepOnSelect
+            multiple
           />
         </Card>
       </Section>

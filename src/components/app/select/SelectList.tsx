@@ -18,36 +18,16 @@ export interface SelectListProps {
 }
 
 export function SelectList(props: SelectListProps) {
-  const {
-    options,
-    value,
-    showCheckbox,
-    iconCheck,
-    iconUncheck,
-    triggerColumn,
-    isLeft,
-    splitColumns,
-    iconGroup,
-    onSelect,
-    onTrigger
-  } = props;
+  const { options, splitColumns, ...rest } = props;
 
   return (
     <div className={clsx("overflow-auto", splitColumns && "flex-grow w-full")}>
       {options.map((option) => (
         <SelectOption
+          {...rest}
           key={option.value}
           option={option}
-          value={value}
-          showCheckbox={showCheckbox}
-          iconCheck={iconCheck}
-          iconUncheck={iconUncheck}
-          iconGroup={iconGroup}
-          isLeft={isLeft}
-          triggerColumn={triggerColumn}
           splitColumns={splitColumns}
-          onSelect={onSelect}
-          onTrigger={onTrigger}
         />
       ))}
     </div>

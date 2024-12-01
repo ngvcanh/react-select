@@ -33,14 +33,21 @@ export function isEquals(newValue: SelectPrimitive[], oldValue: SelectPrimitive[
   return newValue.every((value) => oldValue.includes(value));
 }
 
-export function toggleValue(value: SelectPrimitive, current: SelectPrimitive[], maxSelect = -1) {
-  return current.includes(value)
-    ? current.filter((val) => val !== value)
-    : (
-      maxSelect < 1 || current.length < maxSelect
-        ? [...current, value]
-        : current
-    );
+export function toggleValue(values: SelectPrimitive[], current: SelectPrimitive[], maxSelect = -1) {
+  if (values.every(value => current.includes(value))) {
+    return current.filter(value => !values.includes(value));
+  }
+
+  maxSelect = Math.round(maxSelect);
+  const missingValues = values.filter(value => !current.includes(value));
+
+  return missingValues.reduce((acc, value) => {
+    if (maxSelect > 0 && acc.length >= maxSelect) {
+      return acc;
+    }
+
+    return [...acc, value];
+  }, current);
 }
 
 export interface SelectNormalizedOptions {
@@ -125,4 +132,14 @@ export function calcDropdownWidth(menuWidth: SelectPrimitive | undefined, ratio:
   }
 
   return menuWidth;
+}
+
+export function isSelectedStatus(options: SelectItemOption<SelectPrimitive>[], value: SelectPrimitive[]) {
+  const members = options.map((option) => option.value!);
+  const selected = members.filter((member) => value.includes(member));
+  return {
+    all: !!members.length && members.length === selected.length,
+    some: !!selected.length && selected.length < options.length
+  };
+
 }

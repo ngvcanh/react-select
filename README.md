@@ -15,7 +15,8 @@
 - [x] ✅ Separator
 - [x] ✅ Max height dropdown
 - [x] ✅ Keep dropdown on select multiple
-- [x] ✅ Auto fit dropdown with screen space
+- [x] ✅ Auto fit vertical dropdown with screen space
+- [ ] ᠆ Auto fit horizontal dropdown with screen space
 - [ ] ᠆ Virtual scroll for long list
 - [ ] ᠆ Loading state when fetch options
 - [ ] ᠆ Disabled for select
@@ -28,3 +29,5 @@
 - [ ] ᠆ Custom option render function
 - [ ] ᠆ Size variants (support: xs, sm, md[default], lg, xl)
 - [x] ✅ Modal responsive
+- [ ] ᠆ Unit test
+- [ ] ᠆ Security test

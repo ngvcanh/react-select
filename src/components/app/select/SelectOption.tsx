@@ -34,7 +34,7 @@ export function SelectOption(props: SelectOptionProps) {
   } = props;
 
   const handleClickOption = (option: SelectItem<SelectPrimitive>) => () => {
-    if (option.disabled || option.group) {
+    if (option.disabled || (option.group && !splitColumns)) {
       return;
     }
 

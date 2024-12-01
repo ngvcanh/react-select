@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { SelectItemOption, SelectPrimitive } from "./types";
-import { isEquals } from "./utils";
+import { isSelectedStatus } from "./utils";
 
 type SelectCheckSize = "sm" | "md" | "lg";
 
@@ -33,14 +33,9 @@ const beforeSizes = {
 export function SelectCheck(props: SelectCheckProps) {
   const { value, options, size = "md" } = props;
 
-  const members = (options?.map((option) => option.value) ?? []) as SelectPrimitive[];
-  const selected = members.filter((member) => value.includes(member as SelectPrimitive));
-
-  const isCheckAll = members.length && isEquals(selected, members);
-  const isCheckMember = !!selected.length && !isCheckAll;
-  const isUncheck = !isCheckAll && !isCheckMember;
-
-  const state = isCheckAll ? "checkedall" : isCheckMember ? "checkedmember" : "uncheck";
+  const status = isSelectedStatus(options, value);
+  const isUncheck = !status.some && !status.all;
+  const state = status.all ? "checkedall" : status.some ? "checkedmember" : "uncheck";
 
   return (
     <span 
@@ -52,8 +47,8 @@ export function SelectCheck(props: SelectCheckProps) {
           "bg-blue-400": !isUncheck,
           "before:border-transparent before:rotate-0 before:border-0 before:scale-0": isUncheck,
           "before:border-white": !isUncheck,
-          "before:scale-100 before:rotate-0": isCheckMember,
-          "before:-rotate-45 before:scale-100": isCheckAll,
+          "before:scale-100 before:rotate-0": status.some,
+          "before:-rotate-45 before:scale-100": status.all,
         },
         state !== "uncheck" && beforeSizes[state][size],
       )}

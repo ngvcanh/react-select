@@ -11,7 +11,7 @@ import {
   useRef,
   useState
 } from "react";
-import { SelectItem, SelectItemGroup, SelectPortalRef, SelectPrimitive, SelectRenderValueParams } from "./types";
+import { SelectItem, SelectItemGroup, SelectItemOption, SelectPortalRef, SelectPrimitive, SelectRenderValueParams } from "./types";
 import { createEvent, defaultRenderValue, isEquals, normalizeOptions, normalizeValue, toggleValue } from "./utils";
 import { Breakpoint, Breakpoints, useMediaQuery } from "./useMediaQuery";
 import { SelectDropdown } from "./SelectDropdown";
@@ -228,20 +228,30 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       }
     };
 
-    const handleSelect = (option: SelectItem<SelectPrimitive>) => {
-      let isKeep = false;
-
-      if (multiple) {
-        isKeep = keepOnSelect ?? true;
-        setCurrentValue((prev) => toggleValue(option.value!, prev, maxSelect));
-        onChange?.(createEvent(name, toggleValue(option.value!, currentValue, maxSelect), multiple));
-      } else {
-        isKeep = keepOnSelect ?? false;
-        setCurrentValue([option.value!]);
-        onChange?.(createEvent(name, [option.value!], multiple));
+    const handleSelectSingle = (option: SelectItem<SelectPrimitive>) => {
+      if (option.group) {
+        return;
       }
 
-      isKeep || handleClosePortal();
+      setCurrentValue([option.value!]);
+      onChange?.(createEvent(name, [option.value!], multiple));
+      keepOnSelect || handleClosePortal();
+    }
+
+    const handleSelectMultiple = (option: SelectItem<SelectPrimitive>) => {
+      const childrenOptions = (option.group
+          ? (option as SelectItemGroup).children
+          : [option]) as SelectItemOption<SelectPrimitive>[];
+      const members = childrenOptions.map((item) => item.value!);
+
+
+      setCurrentValue((prev) => toggleValue(members, prev, maxSelect));
+      onChange?.(createEvent(name, toggleValue(members, currentValue, maxSelect), multiple));
+      (keepOnSelect ?? true) || handleClosePortal();
+    };
+
+    const handleSelect = (option: SelectItem<SelectPrimitive>) => {
+      multiple ? handleSelectMultiple(option) : handleSelectSingle(option);
     };
 
     const handleChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
