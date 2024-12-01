@@ -1,9 +1,9 @@
 import { ComponentType, forwardRef, Fragment, MouseEvent, PropsWithChildren, ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import { SelectSeparator } from "./SelectSeparator";
-import clsx from "clsx";
 import { SelectSize } from "./types";
 import { getSelectSize } from "./utils";
+import clsx from "clsx";
 
 export interface SelectAnchorProps {
   className?: string;
@@ -13,6 +13,7 @@ export interface SelectAnchorProps {
   iconDropdown?: ReactNode;
   opened?: boolean;
   size: SelectSize;
+  disabled?: boolean;
   onClick?(e: MouseEvent<HTMLDivElement>): void;
 }
 
@@ -27,6 +28,7 @@ export const SelectAnchor = forwardRef<HTMLDivElement, PropsWithChildren<SelectA
       separator,
       truncate,
       size,
+      disabled,
       onClick
     } = props;
 
@@ -36,7 +38,11 @@ export const SelectAnchor = forwardRef<HTMLDivElement, PropsWithChildren<SelectA
       <div
         ref={ref}
         className={clsx(
-          "border rounded cursor-pointer w-full hover:border-blue-500",
+          "border rounded cursor-pointer w-full",
+          {
+            "bg-gray-400/40": disabled,
+            "hover:border-blue-500": !disabled,
+          },
           selectSize.classes?.select,
           className
         )}

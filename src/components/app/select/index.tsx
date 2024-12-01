@@ -104,6 +104,8 @@ export interface SelectProps {
   autoFit?: boolean;
   size?: SelectSize;
   groupCollapse?: boolean;
+  disabled?: boolean;
+  readonly?: boolean;
   isGroup?(item: SelectItem): item is SelectItemGroup;
   getOptionValue?(item: SelectItem): SelectPrimitive;
   getOptionLabel?(item: SelectItem): SelectPrimitive;
@@ -152,6 +154,8 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       triggerColumn,
       size = "md",
       groupCollapse,
+      disabled,
+      readonly,
       isGroup,
       getOptionValue,
       getOptionLabel,
@@ -241,6 +245,10 @@ export const Select = forwardRef<SelectRef, SelectProps>(
     );
 
     const handleClickAnchor = () => {
+      if (disabled || readonly) {
+        return;
+      }
+
       const shouldSetSearchTerm = !isOpen && searchable && !searchTerm && !multiple;
       setIsOpen(true);
 
@@ -333,6 +341,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
           iconDropdown={iconDropdown}
           wrapper={components.anchorWrapper}
           size={size}
+          disabled={disabled}
           onClick={handleClickAnchor}
         >
           <SelectValue

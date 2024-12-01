@@ -317,6 +317,14 @@ export default function Home() {
           />
         </Card>
       </Section>
+      <Section title="Controlled">
+        <Card title="Disabled">
+          <Select options={options} value={1} disabled />
+        </Card>
+        <Card title="ReadOnly">
+          <Select options={options} multiple value={[1, 2, 3]} readonly />
+        </Card>
+      </Section>
     </div>
   );
 }

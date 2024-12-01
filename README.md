@@ -18,15 +18,16 @@
 - [x] ✅ Auto fit vertical dropdown with screen space
 - [x] ✅ Option grouping
 - [x] ✅ Option grouping 2 columns
-- [x] ✅ Modal responsive (`popup` | `sheet`)
-- [x] ✅ Size variants (support: xs, sm, md[default], lg, xl)
+- [x] ✅ Modal responsive [responsiveType](`popup` | `sheet`)
+- [x] ✅ Size variants (support: `3xs`, `2xs`, `xs`, `sm`, `md`[default], `lg`, `xl`, `2xl`, `3xl`)
 - [x] ✅ Display group label instance children if select all [groupCollapse]
+- [x] ✅ Disabled for select
+- [x] ✅ Readonly for select
 - [ ] ᠆ Auto scroll to first selected item
 - [ ] ᠆ Render select label in dropdown (using `renderMenuLabel`)
 - [ ] ᠆ Auto fit horizontal dropdown with screen space
 - [ ] ᠆ Virtual scroll for long list
 - [ ] ᠆ Loading state when fetch options
-- [ ] ᠆ Disabled for select
 - [ ] ᠆ Keyboard navigation (arrow keys, enter, escapte)
 - [ ] ᠆ Clearable
 - [ ] ᠆ Custom filter function
