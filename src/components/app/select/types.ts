@@ -31,3 +31,9 @@ export interface SelectItemOption<Type = unknown> extends Record<string, unknown
 }
 
 export type SelectItem<Type = unknown> = SelectItemGroup<Type> | SelectItemOption<Type>;
+
+export interface SelectRenderMenuLabel {
+  values: SelectPrimitive[];
+  option?: SelectItem<SelectPrimitive> | null;
+  setValue(value: SelectPrimitive[]): void;
+}

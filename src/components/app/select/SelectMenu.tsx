@@ -1,5 +1,5 @@
 import { ReactNode, useState } from "react";
-import { SelectItem, SelectItemGroup, SelectPrimitive, SelectTriggerColumn } from "./types";
+import { SelectItem, SelectItemGroup, SelectPrimitive, SelectRenderMenuLabel, SelectTriggerColumn } from "./types";
 import { SelectList } from "./SelectList";
 import clsx from "clsx";
 
@@ -12,6 +12,8 @@ export interface SelectMenuProps {
   iconGroup?: ReactNode;
   splitColumns?: boolean;
   triggerColumn?: SelectTriggerColumn;
+  renderMenuLabel?(params: SelectRenderMenuLabel): ReactNode;
+  setValue(value: SelectPrimitive[]): void;
   onSelect(option: SelectItem<SelectPrimitive>): void;
 }
 
@@ -24,13 +26,11 @@ export function SelectMenu(props: SelectMenuProps) {
   };
 
   return (
-    <div className={clsx("w-full", splitColumns ? "flex" : "")}>
-      <SelectList {...props} isLeft onTrigger={handleTrigger} />
+    <div className={clsx("w-full relative", splitColumns ? "flex" : "")}>
+      <SelectList {...props} onTrigger={handleTrigger} />
       {splitColumns && (
         <div className="flex-grow w-full">
-          {!!hovered && (
-            <SelectList {...props} options={hovered.children as SelectItem<SelectPrimitive>[]} />
-          )}
+          <SelectList {...props} option={hovered} />
         </div>
       )}
     </div>

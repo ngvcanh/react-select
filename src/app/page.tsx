@@ -316,6 +316,30 @@ export default function Home() {
             triggerColumn="clickset"
           />
         </Card>
+        <Card title={`Multiple (renderMenuLabel) [splitColumns=true][keepOnSelect=true|default][trigger="clickset"][groupCollapse=true]`}>
+          <Select
+            options={options}
+            placeholder="Select option"
+            splitColumns
+            keepOnSelect
+            multiple
+            groupCollapse
+            triggerColumn="clickset"
+            renderMenuLabel={(params) => {
+              const { values, option, setValue } = params;
+              return (
+                <div className="sticky top-0 flex items-center justify-between w-full py-2 bg-slate-700 text-slate-200">
+                  <span>
+                    {option !== undefined ? (option?.label ?? "Select left option") : "Select option"}
+                  </span>
+                  {option !== undefined && (
+                    <button type="button" onClick={() => setValue([])}>Clear all ({values.length})</button>
+                  )}
+                </div>
+              );
+            }}
+          />
+        </Card>
       </Section>
       <Section title="Controlled">
         <Card title="Disabled">

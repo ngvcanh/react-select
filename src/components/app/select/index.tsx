@@ -18,6 +18,7 @@ import {
   SelectPortalBackdrop,
   SelectPortalRef,
   SelectPrimitive,
+  SelectRenderMenuLabel,
   SelectRenderValueParams,
   SelectResponsiveType,
   SelectSize,
@@ -111,6 +112,7 @@ export interface SelectProps {
   getOptionLabel?(item: SelectItem): SelectPrimitive;
   renderChip?(option: SelectItem<SelectPrimitive> | number): JSX.Element;
   renderValue?(option: SelectItem<SelectPrimitive>, params: SelectRenderValueParams): ReactNode;
+  renderMenuLabel?(params: SelectRenderMenuLabel): ReactNode;
   onChange?(e: SyntheticEvent): void;
 }
 
@@ -161,6 +163,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       getOptionLabel,
       renderChip,
       renderValue = defaultRenderValue,
+      renderMenuLabel,
       onChange,
     } = props;
 
@@ -319,6 +322,8 @@ export const Select = forwardRef<SelectRef, SelectProps>(
             splitColumns,
             triggerColumn,
             onSelect: handleSelect,
+            renderMenuLabel,
+            setValue: setCurrentValue,
           }}
         />
         {components.footer ? (

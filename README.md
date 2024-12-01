@@ -23,8 +23,8 @@
 - [x] ✅ Display group label instance children if select all [groupCollapse]
 - [x] ✅ Disabled for select
 - [x] ✅ Readonly for select
+- [x] ✅ Render select label in dropdown (using `renderMenuLabel`)
 - [ ] ᠆ Auto scroll to first selected item
-- [ ] ᠆ Render select label in dropdown (using `renderMenuLabel`)
 - [ ] ᠆ Auto fit horizontal dropdown with screen space
 - [ ] ᠆ Virtual scroll for long list
 - [ ] ᠆ Loading state when fetch options
