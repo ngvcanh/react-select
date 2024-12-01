@@ -20,6 +20,7 @@ import {
   SelectPrimitive,
   SelectRenderValueParams,
   SelectResponsiveType,
+  SelectSize,
   SelectTriggerColumn
 } from "./types";
 import {
@@ -101,6 +102,7 @@ export interface SelectProps {
     }>;
   };
   autoFit?: boolean;
+  size?: SelectSize;
   isGroup?(item: SelectItem): item is SelectItemGroup;
   getOptionValue?(item: SelectItem): SelectPrimitive;
   getOptionLabel?(item: SelectItem): SelectPrimitive;
@@ -147,6 +149,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       components = {},
       autoFit,
       triggerColumn,
+      size = "md",
       isGroup,
       getOptionValue,
       getOptionLabel,
@@ -327,6 +330,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
           separator={separator}
           iconDropdown={iconDropdown}
           wrapper={components.anchorWrapper}
+          size={size}
           onClick={handleClickAnchor}
         >
           <SelectValue
@@ -350,6 +354,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
               onRemove: handleRemoveValue,
               setSearchTerm,
               setShouldFilter,
+              size,
             }}
           />
         </SelectAnchor>

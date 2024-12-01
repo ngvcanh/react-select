@@ -2,6 +2,8 @@ import { ComponentType, forwardRef, Fragment, MouseEvent, PropsWithChildren, Rea
 import { ChevronDown } from "lucide-react";
 import { SelectSeparator } from "./SelectSeparator";
 import clsx from "clsx";
+import { SelectSize } from "./types";
+import { getSelectSize } from "./utils";
 
 export interface SelectAnchorProps {
   className?: string;
@@ -10,21 +12,44 @@ export interface SelectAnchorProps {
   separator?: boolean;
   iconDropdown?: ReactNode;
   opened?: boolean;
+  size: SelectSize;
   onClick?(e: MouseEvent<HTMLDivElement>): void;
 }
 
 export const SelectAnchor = forwardRef<HTMLDivElement, PropsWithChildren<SelectAnchorProps>>(
   function SelectAnchor(props, ref) {
-    const { children, className, iconDropdown, opened, wrapper: Wrapper = Fragment, separator, truncate, onClick } = props;
+    const {
+      children,
+      className,
+      iconDropdown,
+      opened,
+      wrapper: Wrapper = Fragment,
+      separator,
+      truncate,
+      size,
+      onClick
+    } = props;
+
+    const selectSize = getSelectSize(size);
 
     return (
-      <div ref={ref} className={clsx("border rounded cursor-pointer w-full hover:border-blue-500", className)}>
+      <div
+        ref={ref}
+        className={clsx(
+          "border rounded cursor-pointer w-full hover:border-blue-500",
+          selectSize.classes?.select,
+          className
+        )}
+      >
         <Wrapper>
           <div
-            className="flex items-center justify-between w-full p-2 overflow-hidden text-sm"
+            className={clsx(
+              "flex items-center justify-between w-full overflow-hidden text-sm",
+              selectSize.classes?.anchor
+            )}
             onClick={onClick}
           >
-            <div className={clsx("flex-1 min-w-0", truncate ? "truncate" : "")}>
+            <div className={clsx("flex-1 min-w-0", truncate ? "truncate" : "", selectSize.classes?.anchorText)}>
               {children}
             </div>
             <SelectSeparator enabled={!!separator} />

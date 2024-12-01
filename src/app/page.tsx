@@ -64,6 +64,35 @@ const otherOptions = options.map((option) => {
 export default function Home() {
   return (
     <div className="w-full min-h-screen p-10">
+      <Section title="Size [multiple=true][chip=true][truncate=false]">
+        <Card title="3xs">
+          <Select options={options} chip multiple truncate={false} placeholder="Select" size="3xs" />
+        </Card>
+        <Card title="2xs">
+          <Select options={options} chip multiple truncate={false} placeholder="Select" size="2xs" />
+        </Card>
+        <Card title="xs">
+          <Select options={options} chip multiple truncate={false} placeholder="Select" size="xs" />
+        </Card>
+        <Card title="sm">
+          <Select options={options} chip multiple truncate={false} placeholder="Select" size="sm" />
+        </Card>
+        <Card title="md[default]">
+          <Select options={options} chip multiple truncate={false} placeholder="Select" size="md" />
+        </Card>
+        <Card title="lg">
+          <Select options={options} chip multiple truncate={false} placeholder="Select" size="lg" />
+        </Card>
+        <Card title="xl">
+          <Select options={options} chip multiple truncate={false} placeholder="Select" size="xl" />
+        </Card>
+        <Card title="2xl">
+          <Select options={options} chip multiple truncate={false} placeholder="Select" size="2xl" />
+        </Card>
+        <Card title="3xl">
+          <Select options={options} chip multiple truncate={false} placeholder="Select" size="3xl" />
+        </Card>
+      </Section>
       <Section title="Single">
         <Card title="Normally">
           <Select options={options} />

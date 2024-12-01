@@ -107,12 +107,19 @@ export const SelectDropdown = forwardRef<SelectPortalRef, PropsWithChildren<Sele
 
       requestAnimationFrame(updatePosition);
 
+      const resizeObserver = new ResizeObserver(updatePosition);
+      const intersectionObserver = new IntersectionObserver(updatePosition);
+      resizeObserver.observe(anchorRef.current);
+      intersectionObserver.observe(anchorRef.current);
+
       window.addEventListener("resize", updatePosition);
       window.addEventListener("scroll", updatePosition);
 
       return () => {
         window.removeEventListener("resize", updatePosition);
         window.removeEventListener("scroll", updatePosition);
+        resizeObserver.disconnect();
+        intersectionObserver.disconnect();
       };
     }, [isOpen, offset, anchorRef, splitColumns, menuWidth, autoFit, maxHeight]);
 

@@ -1,7 +1,7 @@
 import { ChangeEvent, Fragment, MouseEvent, ReactNode, RefObject } from "react";
-import { SelectItem, SelectPrimitive, SelectRenderValueParams } from "./types";
+import { SelectItem, SelectPrimitive, SelectRenderValueParams, SelectSize } from "./types";
 import { SelectSearch } from "./SelectSearch";
-import { defaultRenderValue } from "./utils";
+import { defaultRenderValue, flattenOptions, getSelectSize } from "./utils";
 import { X } from "lucide-react";
 import clsx from "clsx";
 
@@ -20,6 +20,7 @@ export interface SelectValueProps {
   truncate?: boolean;
   removable?: boolean;
   iconRemove?: ReactNode;
+  size: SelectSize;
   setSearchTerm(value: string): void;
   setShouldFilter(value: boolean): void;
   onRemove(option: SelectItem<SelectPrimitive>): void;
@@ -43,6 +44,7 @@ export function SelectValue(props: SelectValueProps) {
     truncate,
     removable = true,
     iconRemove,
+    size,
     setSearchTerm,
     setShouldFilter,
     renderValue = defaultRenderValue,
@@ -50,7 +52,8 @@ export function SelectValue(props: SelectValueProps) {
     onRemove,
   } = props;
 
-  const selected = options.filter((opt) => value.includes(opt.value!));
+  const flattern = flattenOptions(options);
+  const selected = flattern.filter((opt) => value.includes(opt.value!));
 
   const handleChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setShouldFilter(true);
@@ -74,7 +77,7 @@ export function SelectValue(props: SelectValueProps) {
       />
     );
   }
-
+  console.log(selected);
   const displayOptions = displayCount > 0 ? selected.slice(0, displayCount) : selected;
   const remaining = selected.length - displayOptions.length;
 
@@ -103,8 +106,16 @@ export function SelectValue(props: SelectValueProps) {
     onRemove(option);
   }
 
+  const selectSize = getSelectSize(size);
+
   return (
-    <div className={clsx("flex gap-1", truncate ? "flex-nowrap overflow-hidden" : "flex-wrap")}>
+    <div
+      className={clsx(
+        "flex gap-1",
+        truncate ? "flex-nowrap overflow-hidden" : "flex-wrap",
+        selectSize.classes?.chipWrapper
+      )}
+    >
       {displayOptions.map((option) => {
         if (renderChip) {
           return (
@@ -118,13 +129,14 @@ export function SelectValue(props: SelectValueProps) {
           <div
             key={option.value}
             className={clsx(
-              "inline-flex items-center flex-1 w-auto max-w-max gap-1 px-2 py-1 text-sm bg-blue-100/20 backdrop-blur-md",
+              "inline-flex items-center flex-1 w-auto max-w-max py-1 text-sm bg-blue-100/20 backdrop-blur-md",
               "rounded min-w-max",
+              selectSize.classes?.chip,
             )}
           >
             <span className={truncate ? "truncate" : ""}>{option?.label}</span>
             {removable && (
-              <span className="-mr-2 px-1 h-full inline-flex items-center" onClick={handleRemove(option)}>
+              <span className={clsx("px-1 h-full inline-flex items-center", selectSize.classes?.chipIcon)} onClick={handleRemove(option)}>
                 {iconRemove || <X className="w-3 h-3 cursor-pointer hover:text-red-500" />}
               </span>
             )}

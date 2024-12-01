@@ -1,5 +1,5 @@
 import { SyntheticEvent } from "react";
-import { SelectItem, SelectItemGroup, SelectItemOption, SelectPrimitive, SelectRenderValueParams } from "./types";
+import { SelectItem, SelectItemGroup, SelectItemOption, SelectPrimitive, SelectRenderValueParams, SelectSize } from "./types";
 
 export function defaultRenderValue(option: SelectItem, params: SelectRenderValueParams) {
   const { multiple, isLast } = params;
@@ -114,6 +114,16 @@ export function normalizeOptions(props: SelectNormalizedOptions): SelectItem<Sel
   return result as SelectItem<SelectPrimitive>[];
 }
 
+export function flattenOptions(options: SelectItem<SelectPrimitive>[]): SelectItem<SelectPrimitive>[] {
+  return options.reduce((acc, option) => {
+    if (option.group) {
+      return [...acc, ...option.children ?? []] as SelectItem<SelectPrimitive>[];
+    }
+
+    return [...acc, option];
+  }, [] as SelectItem<SelectPrimitive>[]);
+}
+
 export function calcDropdownWidth(menuWidth: SelectPrimitive | undefined, ratio: number) {
   if (typeof menuWidth === "undefined") {
     return undefined;
@@ -141,5 +151,89 @@ export function isSelectedStatus(options: SelectItemOption<SelectPrimitive>[], v
     all: !!members.length && members.length === selected.length,
     some: !!selected.length && selected.length < options.length
   };
+}
 
+export const sizes = {
+  "3xs": {
+    select: "min-h-6",
+    anchor: "min-h-[22px] px-1",
+    anchorText: "text-xs",
+    chipWrapper: "py-1",
+    chip: "h-[14px] text-[10px] px-1 gap-0.5",
+    chipIcon: "-mr-1"
+  },
+  "2xs": {
+    select: "min-h-7",
+    anchor: "min-h-[26px] px-1",
+    anchorText: "text-xs",
+    chipWrapper: "py-1",
+    chip: "h-[18px] px-1 text-xs gap-0.5",
+    chipIcon: "-mr-1"
+  },
+  xs: {
+    select: "min-h-8",
+    anchor: "min-h-[30px] px-2",
+    anchorText: "text-sm",
+    chipWrapper: "py-1",
+    chip: "h-[22px] px-1 text-xs gap-0.5",
+    chipIcon: "-mr-1"
+  },
+  sm: {
+    select: "min-h-9",
+    anchor: "min-h-[34px] px-2",
+    anchorText: "text-sm",
+    chipWrapper: "py-1",
+    chip: "h-6 px-1 text-xs gap-0.5",
+    chipIcon: "-mr-1"
+  },
+  md: {
+    select: "min-h-10",
+    anchor: "min-h-[38px] px-2",
+    anchorText: "text-sm",
+    chipWrapper: "py-1.5",
+    chip: "h-[26px] px-1.5 gap-1 text-sm",
+    chipIcon: "-mr-1.5"
+  },
+  lg: {
+    select: "min-h-11",
+    anchor: "min-h-[42px] px-2",
+    anchorText: "text-base",
+    chipWrapper: "py-1.5",
+    chip: "h-[30px] px-2 gap-1.5 text-base",
+    chipIcon: "-mr-2"
+  },
+  "xl": {
+    select: "min-h-12",
+    anchor: "min-h-[46px] px-2",
+    anchorText: "text-base",
+    chipWrapper: "py-1.5",
+    chip: "h-[34px] px-2 gap-1.5 text-base",
+    chipIcon: "-mr-2"
+  },
+  "2xl": {
+    select: "min-h-13",
+    anchor: "min-h-[50px] px-2",
+    anchorText: "text-lg",
+    chipWrapper: "py-2",
+    chip: "h-[36px] px-2 gap-1.5 text-lg",
+    chipIcon: "-mr-2"
+  },
+  "3xl": {
+    select: "min-h-14",
+    anchor: "min-h-[54px] px-2",
+    anchorText: "text-lg",
+    chipWrapper: "py-2",
+    chip: "h-[38px] px-2 gap-1.5 text-lg",
+    chipIcon: "-mr-2"
+  },
+};
+
+export function getSelectSize(size: SelectSize) {
+  if (typeof size === "string") {
+    const classes = sizes[size];
+    return { classes };
+  }
+  
+  const styles = {};
+  return { styles };
 }

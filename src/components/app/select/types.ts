@@ -2,6 +2,7 @@ export type SelectPrimitive = string | number;
 export type SelectTriggerColumn = "hover" | "clicked" | "clickset";
 export type SelectResponsiveType = "modal" | "sheet";
 export type SelectPortalBackdrop = "static" | "closeable";
+export type SelectSize = "3xs" | "2xs" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
 
 export interface SelectRenderValueParams {
   multiple: boolean;
