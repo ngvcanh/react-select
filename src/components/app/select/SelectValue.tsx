@@ -1,7 +1,7 @@
 import { ChangeEvent, Fragment, MouseEvent, ReactNode, RefObject } from "react";
-import { SelectItem, SelectPrimitive, SelectRenderValueParams, SelectSize } from "./types";
+import { SelectItem, SelectItemOption, SelectPrimitive, SelectRenderValueParams, SelectSize } from "./types";
 import { SelectSearch } from "./SelectSearch";
-import { defaultRenderValue, flattenOptions, getSelectSize } from "./utils";
+import { defaultRenderValue, getSelectSize, isSelectedStatus } from "./utils";
 import { X } from "lucide-react";
 import clsx from "clsx";
 
@@ -21,6 +21,7 @@ export interface SelectValueProps {
   removable?: boolean;
   iconRemove?: ReactNode;
   size: SelectSize;
+  groupCollapse?: boolean;
   setSearchTerm(value: string): void;
   setShouldFilter(value: boolean): void;
   onRemove(option: SelectItem<SelectPrimitive>): void;
@@ -45,6 +46,7 @@ export function SelectValue(props: SelectValueProps) {
     removable = true,
     iconRemove,
     size,
+    groupCollapse,
     setSearchTerm,
     setShouldFilter,
     renderValue = defaultRenderValue,
@@ -52,8 +54,29 @@ export function SelectValue(props: SelectValueProps) {
     onRemove,
   } = props;
 
-  const flattern = flattenOptions(options);
-  const selected = flattern.filter((opt) => value.includes(opt.value!));
+  const selected = options.reduce((acc, option) => {
+    if (!option.group) {
+      value.includes(option.value!) && acc.push(option);
+      return acc;
+    }
+
+    const status = isSelectedStatus(option.children! as SelectItemOption<SelectPrimitive>[], value);
+
+    if (!groupCollapse || (!status.all && status.some)) {
+      return [
+        ...acc,
+        ...option.children?.filter(
+          (child) => value.includes((child as SelectItemOption<SelectPrimitive>).value!)
+        ) ?? [],
+      ] as SelectItem<SelectPrimitive>[];
+    }
+
+    if (status.all) {
+      return [ ...acc, option ];
+    }
+
+    return acc;
+  }, [] as SelectItem<SelectPrimitive>[]);
 
   const handleChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setShouldFilter(true);
@@ -77,7 +100,7 @@ export function SelectValue(props: SelectValueProps) {
       />
     );
   }
-  console.log(selected);
+
   const displayOptions = displayCount > 0 ? selected.slice(0, displayCount) : selected;
   const remaining = selected.length - displayOptions.length;
 

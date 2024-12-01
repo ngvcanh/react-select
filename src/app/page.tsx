@@ -305,6 +305,17 @@ export default function Home() {
             triggerColumn="clickset"
           />
         </Card>
+        <Card title={`Multiple [splitColumns=true][keepOnSelect=true|default][trigger="clickset"][groupCollapse=true]`}>
+          <Select
+            options={options}
+            placeholder="Select option"
+            splitColumns
+            keepOnSelect
+            multiple
+            groupCollapse
+            triggerColumn="clickset"
+          />
+        </Card>
       </Section>
     </div>
   );

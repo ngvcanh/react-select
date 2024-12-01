@@ -103,6 +103,7 @@ export interface SelectProps {
   };
   autoFit?: boolean;
   size?: SelectSize;
+  groupCollapse?: boolean;
   isGroup?(item: SelectItem): item is SelectItemGroup;
   getOptionValue?(item: SelectItem): SelectPrimitive;
   getOptionLabel?(item: SelectItem): SelectPrimitive;
@@ -150,6 +151,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       autoFit,
       triggerColumn,
       size = "md",
+      groupCollapse,
       isGroup,
       getOptionValue,
       getOptionLabel,
@@ -355,6 +357,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
               setSearchTerm,
               setShouldFilter,
               size,
+              groupCollapse,
             }}
           />
         </SelectAnchor>

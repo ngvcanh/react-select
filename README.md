@@ -20,8 +20,8 @@
 - [x] ✅ Option grouping 2 columns
 - [x] ✅ Modal responsive (`popup` | `sheet`)
 - [x] ✅ Size variants (support: xs, sm, md[default], lg, xl)
+- [x] ✅ Display group label instance children if select all [groupCollapse]
 - [ ] ᠆ Auto scroll to first selected item
-- [ ] ᠆ Display group label instance children if select all [groupCollapse]
 - [ ] ᠆ Render select label in dropdown (using `renderMenuLabel`)
 - [ ] ᠆ Auto fit horizontal dropdown with screen space
 - [ ] ᠆ Virtual scroll for long list

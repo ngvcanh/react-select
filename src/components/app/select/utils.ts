@@ -114,16 +114,6 @@ export function normalizeOptions(props: SelectNormalizedOptions): SelectItem<Sel
   return result as SelectItem<SelectPrimitive>[];
 }
 
-export function flattenOptions(options: SelectItem<SelectPrimitive>[]): SelectItem<SelectPrimitive>[] {
-  return options.reduce((acc, option) => {
-    if (option.group) {
-      return [...acc, ...option.children ?? []] as SelectItem<SelectPrimitive>[];
-    }
-
-    return [...acc, option];
-  }, [] as SelectItem<SelectPrimitive>[]);
-}
-
 export function calcDropdownWidth(menuWidth: SelectPrimitive | undefined, ratio: number) {
   if (typeof menuWidth === "undefined") {
     return undefined;
