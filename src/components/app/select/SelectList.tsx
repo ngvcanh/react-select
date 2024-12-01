@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { SelectItem, SelectPrimitive } from "./types";
+import { SelectItem, SelectPrimitive, SelectTriggerColumn } from "./types";
 import { SelectOption } from "./SelectOption";
 import clsx from "clsx";
 
@@ -11,7 +11,7 @@ export interface SelectListProps {
   iconUncheck?: ReactNode;
   iconGroup?: ReactNode;
   isLeft?: boolean;
-  triggerColumn?: "hover" | "selected";
+  triggerColumn?: SelectTriggerColumn;
   splitColumns?: boolean;
   onTrigger?(option: SelectItem<SelectPrimitive> | null): void;
   onSelect(option: SelectItem<SelectPrimitive>): void;

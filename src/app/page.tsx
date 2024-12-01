@@ -247,13 +247,33 @@ export default function Home() {
             splitColumns
           />
         </Card>
-        <Card title={`Multiple [splitColumns=true][keepOnSelect=true|default][trigger="hover"]`}>
+        <Card title={`Multiple [splitColumns=true][keepOnSelect=true|default][trigger="hover"|default]`}>
           <Select
             options={options}
             placeholder="Select option"
             splitColumns
             keepOnSelect
             multiple
+          />
+        </Card>
+        <Card title={`Multiple [splitColumns=true][keepOnSelect=true|default][trigger="clicked"]`}>
+          <Select
+            options={options}
+            placeholder="Select option"
+            splitColumns
+            keepOnSelect
+            multiple
+            triggerColumn="clicked"
+          />
+        </Card>
+        <Card title={`Multiple [splitColumns=true][keepOnSelect=true|default][trigger="clickset"]`}>
+          <Select
+            options={options}
+            placeholder="Select option"
+            splitColumns
+            keepOnSelect
+            multiple
+            triggerColumn="clickset"
           />
         </Card>
       </Section>

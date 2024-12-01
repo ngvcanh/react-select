@@ -11,8 +11,25 @@ import {
   useRef,
   useState
 } from "react";
-import { SelectItem, SelectItemGroup, SelectItemOption, SelectPortalRef, SelectPrimitive, SelectRenderValueParams } from "./types";
-import { createEvent, defaultRenderValue, isEquals, normalizeOptions, normalizeValue, toggleValue } from "./utils";
+import {
+  SelectItem,
+  SelectItemGroup,
+  SelectItemOption,
+  SelectPortalBackdrop,
+  SelectPortalRef,
+  SelectPrimitive,
+  SelectRenderValueParams,
+  SelectResponsiveType,
+  SelectTriggerColumn
+} from "./types";
+import {
+  createEvent,
+  defaultRenderValue,
+  isEquals,
+  normalizeOptions,
+  normalizeValue,
+  toggleValue
+} from "./utils";
 import { Breakpoint, Breakpoints, useMediaQuery } from "./useMediaQuery";
 import { SelectDropdown } from "./SelectDropdown";
 import { SelectModal } from "./SelectModal";
@@ -61,12 +78,12 @@ export interface SelectProps {
   maxHeight?: SelectPrimitive;
   breakpoint?: Breakpoint;
   breakpoints?: Partial<Breakpoints>;
-  responsiveType?: "modal" | "sheet";
-  backdrop?: "static" | "closeable";
+  responsiveType?: SelectResponsiveType;
+  backdrop?: SelectPortalBackdrop;
   modalWidth?: SelectPrimitive;
   asChild?: boolean;
   splitColumns?: boolean;
-  triggerColumn?: "hover" | "selected";
+  triggerColumn?: SelectTriggerColumn;
   menuWidth?: SelectPrimitive;
   iconGroup?: ReactNode;
   debug?: boolean;
@@ -129,6 +146,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       iconGroup,
       components = {},
       autoFit,
+      triggerColumn,
       isGroup,
       getOptionValue,
       getOptionLabel,
@@ -278,14 +296,17 @@ export const Select = forwardRef<SelectRef, SelectProps>(
           />
         )}
         <SelectMenu
-          options={filteredOptions}
-          value={currentValue}
-          showCheckbox={showCheckbox}
-          iconCheck={iconCheck}
-          iconUncheck={iconUncheck}
-          iconGroup={iconGroup}
-          splitColumns={splitColumns}
-          onSelect={handleSelect}
+          {...{
+            options: filteredOptions,
+            value: currentValue,
+            showCheckbox,
+            iconCheck,
+            iconUncheck,
+            iconGroup,
+            splitColumns,
+            triggerColumn,
+            onSelect: handleSelect,
+          }}
         />
         {components.footer ? (
           <components.footer {...{

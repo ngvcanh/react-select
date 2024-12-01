@@ -16,6 +16,11 @@
 - [x] ✅ Max height dropdown
 - [x] ✅ Keep dropdown on select multiple
 - [x] ✅ Auto fit vertical dropdown with screen space
+- [x] ✅ Option grouping
+- [x] ✅ Option grouping 2 columns
+- [x] ✅ Modal responsive
+- [ ] ᠆ Size variants (support: xs, sm, md[default], lg, xl)
+- [ ] ᠆ Auto scroll to first selected item
 - [ ] ᠆ Auto fit horizontal dropdown with screen space
 - [ ] ᠆ Virtual scroll for long list
 - [ ] ᠆ Loading state when fetch options
@@ -23,11 +28,8 @@
 - [ ] ᠆ Keyboard navigation (arrow keys, enter, escapte)
 - [ ] ᠆ Clearable
 - [ ] ᠆ Custom filter function
-- [ ] ✅ Option grouping
-- [ ] ᠆ Option grouping 2 columns
 - [ ] ᠆ Async search/load options
 - [ ] ᠆ Custom option render function
-- [ ] ᠆ Size variants (support: xs, sm, md[default], lg, xl)
-- [x] ✅ Modal responsive
+- [ ] ᠆ Highlight search keyword
 - [ ] ᠆ Unit test
 - [ ] ᠆ Security test

@@ -1,5 +1,14 @@
-import { CSSProperties, forwardRef, PropsWithChildren, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { SelectPortalRef, SelectPrimitive } from "./types";
+import {
+  CSSProperties,
+  forwardRef,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState
+} from "react";
+import { SelectPortalBackdrop, SelectPortalRef, SelectPrimitive } from "./types";
 import { usePreventBodyScroll } from "./usePreventBodyScroll";
 import { SelectPortal } from "./SelectPortal";
 import clsx from "clsx";
@@ -7,7 +16,7 @@ import clsx from "clsx";
 export interface SelectDialogProps {
   opened?: boolean;
   onClose?(): void;
-  backdrop?: "static" | "closeable";
+  backdrop?: SelectPortalBackdrop;
   className?: string;
   classNames?: {
     portal?: string;

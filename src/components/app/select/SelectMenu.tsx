@@ -1,5 +1,5 @@
 import { ReactNode, useState } from "react";
-import { SelectItem, SelectItemGroup, SelectPrimitive } from "./types";
+import { SelectItem, SelectItemGroup, SelectPrimitive, SelectTriggerColumn } from "./types";
 import { SelectList } from "./SelectList";
 import clsx from "clsx";
 
@@ -11,6 +11,7 @@ export interface SelectMenuProps {
   iconUncheck?: ReactNode;
   iconGroup?: ReactNode;
   splitColumns?: boolean;
+  triggerColumn?: SelectTriggerColumn;
   onSelect(option: SelectItem<SelectPrimitive>): void;
 }
 

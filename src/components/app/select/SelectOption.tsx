@@ -1,5 +1,5 @@
 import { Fragment, ReactNode } from "react";
-import { SelectItem, SelectItemGroup, SelectItemOption, SelectPrimitive } from "./types";
+import { SelectItem, SelectItemGroup, SelectItemOption, SelectPrimitive, SelectTriggerColumn } from "./types";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { SelectCheck } from "./SelectCheck";
 import clsx from "clsx";
@@ -12,7 +12,7 @@ export interface SelectOptionProps {
   iconUncheck?: ReactNode;
   iconGroup?: ReactNode;
   splitColumns?: boolean;
-  triggerColumn?: "hover" | "selected";
+  triggerColumn?: SelectTriggerColumn;
   isLeft?: boolean;
   onSelect(option: SelectItem<SelectPrimitive>): void;
   onTrigger?(option: SelectItem<SelectPrimitive> | null): void;
@@ -38,7 +38,17 @@ export function SelectOption(props: SelectOptionProps) {
       return;
     }
 
-    onSelect(option);
+    if (!option.group) {
+      onSelect(option);
+      return;
+    }
+
+    if (triggerColumn === "clicked") {
+      onTrigger?.(option);
+    } else if (triggerColumn === "clickset") {
+      onTrigger?.(option);
+      onSelect(option);
+    }
   }
 
   const handleMouseOver = () => {
@@ -51,8 +61,6 @@ export function SelectOption(props: SelectOptionProps) {
 
   const selected = !option.group && value.includes(option.value!);
   const GroupRightIcon = splitColumns ? ChevronRight : ChevronDown;
-
-  
 
   return (
     <>
