@@ -61,6 +61,15 @@ const otherOptions = options.map((option) => {
   return { ...rest, id: value, name: label };
 });
 
+const longOptionAndGroup = [
+  ...Array.from({ length: 30 }, (_, i) => ({
+    value: `${Date.now()}-${i}`,
+    label: `Item ${i + 1}`,
+    group: i % 3 === 0,
+  })),
+  ...options,
+];
+
 export default function Home() {
   return (
     <div className="w-full min-h-screen p-10">
@@ -269,14 +278,14 @@ export default function Home() {
             getOptionLabel={(item) => item.name as string}
           />
         </Card>
-        <Card title={`Single [splitColumns=true][trigger="hover"|default]`}>
+        <Card title={`Single [splitColumns=true][triggerColumn="hover"|default]`}>
           <Select
             options={options}
             placeholder="Select option"
             splitColumns
           />
         </Card>
-        <Card title={`Multiple [splitColumns=true][keepOnSelect=true|default][trigger="hover"|default]`}>
+        <Card title={`Multiple [splitColumns=true][keepOnSelect=true|default][triggerColumn="hover"|default]`}>
           <Select
             options={options}
             placeholder="Select option"
@@ -285,7 +294,7 @@ export default function Home() {
             multiple
           />
         </Card>
-        <Card title={`Multiple [splitColumns=true][keepOnSelect=true|default][trigger="clicked"]`}>
+        <Card title={`Multiple [splitColumns=true][keepOnSelect=true|default][triggerColumn="clicked"]`}>
           <Select
             options={options}
             placeholder="Select option"
@@ -295,7 +304,7 @@ export default function Home() {
             triggerColumn="clicked"
           />
         </Card>
-        <Card title={`Multiple [splitColumns=true][keepOnSelect=true|default][trigger="clickset"]`}>
+        <Card title={`Multiple [splitColumns=true][keepOnSelect=true|default][triggerColumn="clickset"]`}>
           <Select
             options={options}
             placeholder="Select option"
@@ -305,7 +314,7 @@ export default function Home() {
             triggerColumn="clickset"
           />
         </Card>
-        <Card title={`Multiple [splitColumns=true][keepOnSelect=true|default][trigger="clickset"][groupCollapse=true]`}>
+        <Card title={`Multiple [splitColumns=true][keepOnSelect=true|default][triggerColumn="clickset"][groupCollapse=true]`}>
           <Select
             options={options}
             placeholder="Select option"
@@ -316,7 +325,7 @@ export default function Home() {
             triggerColumn="clickset"
           />
         </Card>
-        <Card title={`Multiple (renderMenuLabel) [splitColumns=true][keepOnSelect=true|default][trigger="clickset"][groupCollapse=true]`}>
+        <Card title={`Multiple (renderMenuLabel) [splitColumns=true][keepOnSelect=true|default][triggerColumn="clickset"][groupCollapse=true]`}>
           <Select
             options={options}
             placeholder="Select option"
@@ -338,6 +347,18 @@ export default function Home() {
                 </div>
               );
             }}
+          />
+        </Card>
+        <Card title={`Multiple Auto scroll [splitColumns=true][keepOnSelect=true|default][triggerColumn="clickset"][groupCollapse=true]`}>
+          <Select
+            options={longOptionAndGroup}
+            placeholder="Select option"
+            splitColumns
+            keepOnSelect
+            multiple
+            groupCollapse
+            triggerColumn="clickset"
+            maxHeight={300}
           />
         </Card>
       </Section>

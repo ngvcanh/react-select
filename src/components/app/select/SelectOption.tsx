@@ -2,6 +2,7 @@ import { Fragment, ReactNode } from "react";
 import { SelectItem, SelectItemGroup, SelectItemOption, SelectPrimitive, SelectTriggerColumn } from "./types";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { SelectCheck } from "./SelectCheck";
+import { isSelectedStatus } from "./utils";
 import clsx from "clsx";
 
 export interface SelectOptionProps {
@@ -14,6 +15,7 @@ export interface SelectOptionProps {
   splitColumns?: boolean;
   triggerColumn?: SelectTriggerColumn;
   isLeft?: boolean;
+  setSelectedRef?(instance: HTMLDivElement): void;
   onSelect(option: SelectItem<SelectPrimitive>): void;
   onTrigger?(option: SelectItem<SelectPrimitive> | null): void;
 }
@@ -29,6 +31,7 @@ export function SelectOption(props: SelectOptionProps) {
     triggerColumn = "hover",
     isLeft,
     iconGroup,
+    setSelectedRef,
     onSelect,
     onTrigger
   } = props;
@@ -66,9 +69,26 @@ export function SelectOption(props: SelectOptionProps) {
   const selected = !option.group && value.includes(option.value!);
   const GroupRightIcon = splitColumns ? ChevronRight : ChevronDown;
 
+  const handleRef = (instance: HTMLDivElement) => {
+    if (option.group && !splitColumns) {
+      return;
+    }
+
+    if (option.group) {
+      const status = isSelectedStatus(option.children! as SelectItemOption<SelectPrimitive>[], value);
+      if (status.all || status.some) {
+        setSelectedRef?.(instance);
+      }
+      return;
+    }
+
+    setSelectedRef?.(instance);
+  };
+
   return (
     <>
       <div
+        ref={handleRef}
         className={clsx(
           "flex items-center gap-2 p-2 cursor-pointer",
           {

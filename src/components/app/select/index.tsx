@@ -107,6 +107,7 @@ export interface SelectProps {
   groupCollapse?: boolean;
   disabled?: boolean;
   readonly?: boolean;
+  scrollToSelected?: boolean;
   isGroup?(item: SelectItem): item is SelectItemGroup;
   getOptionValue?(item: SelectItem): SelectPrimitive;
   getOptionLabel?(item: SelectItem): SelectPrimitive;
@@ -158,6 +159,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       groupCollapse,
       disabled,
       readonly,
+      scrollToSelected,
       isGroup,
       getOptionValue,
       getOptionLabel,
@@ -324,6 +326,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
             onSelect: handleSelect,
             renderMenuLabel,
             setValue: setCurrentValue,
+            scrollToSelected,
           }}
         />
         {components.footer ? (

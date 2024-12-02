@@ -12,6 +12,7 @@ export interface SelectMenuProps {
   iconGroup?: ReactNode;
   splitColumns?: boolean;
   triggerColumn?: SelectTriggerColumn;
+  scrollToSelected?: boolean;
   renderMenuLabel?(params: SelectRenderMenuLabel): ReactNode;
   setValue(value: SelectPrimitive[]): void;
   onSelect(option: SelectItem<SelectPrimitive>): void;
@@ -26,7 +27,7 @@ export function SelectMenu(props: SelectMenuProps) {
   };
 
   return (
-    <div className={clsx("w-full relative", splitColumns ? "flex" : "")}>
+    <div className={clsx("w-full relative flex-1 h-full overflow-hidden", splitColumns ? "flex" : "")}>
       <SelectList {...props} onTrigger={handleTrigger} />
       {splitColumns && (
         <div className="flex-grow w-full">
