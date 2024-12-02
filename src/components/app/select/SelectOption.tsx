@@ -52,6 +52,10 @@ export function SelectOption(props: SelectOptionProps) {
   }
 
   const handleMouseOver = () => {
+    if (option.disabled) {
+      return;
+    }
+
     if (!splitColumns || triggerColumn !== "hover" || !isLeft) {
       return;
     }
