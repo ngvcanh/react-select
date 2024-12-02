@@ -108,6 +108,7 @@ export interface SelectProps {
   disabled?: boolean;
   readonly?: boolean;
   scrollToSelected?: boolean;
+  clearable?: boolean;
   isGroup?(item: SelectItem): item is SelectItemGroup;
   getOptionValue?(item: SelectItem): SelectPrimitive;
   getOptionLabel?(item: SelectItem): SelectPrimitive;
@@ -115,6 +116,7 @@ export interface SelectProps {
   renderValue?(option: SelectItem<SelectPrimitive>, params: SelectRenderValueParams): ReactNode;
   renderMenuLabel?(params: SelectRenderMenuLabel): ReactNode;
   onChange?(e: SyntheticEvent): void;
+  onClear?(): void;
 }
 
 export const Select = forwardRef<SelectRef, SelectProps>(
@@ -167,6 +169,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       renderValue = defaultRenderValue,
       renderMenuLabel,
       onChange,
+      onClear,
     } = props;
 
     const [isOpen, setIsOpen] = useState(false);
@@ -295,6 +298,12 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       setShouldFilter(true);
     };
 
+    const handleClearable = () => {
+      setCurrentValue([]);
+      onChange?.(createEvent(name, [], multiple));
+      onClear?.();
+    }
+
     const dropdownContent = (
       <>
         {components.header ? (
@@ -351,6 +360,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
           size={size}
           disabled={disabled}
           onClick={handleClickAnchor}
+          onClearable={handleClearable}
         >
           <SelectValue
             {...{

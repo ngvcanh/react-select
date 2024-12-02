@@ -4,6 +4,7 @@ import { SelectSeparator } from "./SelectSeparator";
 import { SelectSize } from "./types";
 import { getSelectSize } from "./utils";
 import clsx from "clsx";
+import { SelectClearable } from "./SelectClearable";
 
 export interface SelectAnchorProps {
   className?: string;
@@ -14,7 +15,9 @@ export interface SelectAnchorProps {
   opened?: boolean;
   size: SelectSize;
   disabled?: boolean;
+  clearable?: boolean;
   onClick?(e: MouseEvent<HTMLDivElement>): void;
+  onClearable?(): void;
 }
 
 export const SelectAnchor = forwardRef<HTMLDivElement, PropsWithChildren<SelectAnchorProps>>(
@@ -29,7 +32,9 @@ export const SelectAnchor = forwardRef<HTMLDivElement, PropsWithChildren<SelectA
       truncate,
       size,
       disabled,
-      onClick
+      clearable,
+      onClick,
+      onClearable
     } = props;
 
     const selectSize = getSelectSize(size);
@@ -58,6 +63,7 @@ export const SelectAnchor = forwardRef<HTMLDivElement, PropsWithChildren<SelectA
             <div className={clsx("flex-1 min-w-0", truncate ? "truncate" : "", selectSize.classes?.anchorText)}>
               {children}
             </div>
+            <SelectClearable enabled={!!clearable} onClick={onClearable} />
             <SelectSeparator enabled={!!separator} />
             {iconDropdown || (
               <span className="flex h-full px-2 -mr-2">

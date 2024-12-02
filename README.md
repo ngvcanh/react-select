@@ -24,12 +24,12 @@
 - [x] ✅ Disabled for select
 - [x] ✅ Readonly for select
 - [x] ✅ Render select label in dropdown (using `renderMenuLabel`)
-- [ ] ᠆ Auto scroll to first selected item
+- [x] ✅ Auto scroll to first selected item (known issue: Do not scroll when rendered, current using setTimeout to scroll)
+- [x] ✅ Clearable
 - [ ] ᠆ Auto fit horizontal dropdown with screen space
 - [ ] ᠆ Virtual scroll for long list
 - [ ] ᠆ Loading state when fetch options
 - [ ] ᠆ Keyboard navigation (arrow keys, enter, escapte)
-- [ ] ᠆ Clearable
 - [ ] ᠆ Custom filter function
 - [ ] ᠆ Async search/load options
 - [ ] ᠆ Custom option render function
