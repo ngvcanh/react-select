@@ -1,5 +1,5 @@
 import { SyntheticEvent } from "react";
-import { SelectItem, SelectItemGroup, SelectItemOption, SelectPrimitive, SelectRenderValueParams, SelectSize } from "./types";
+import { SelectAsChild, SelectItem, SelectItemGroup, SelectItemOption, SelectPrimitive, SelectRenderValueParams, SelectSize } from "./types";
 
 export function defaultRenderValue(option: SelectItem, params: SelectRenderValueParams) {
   const { multiple, isLast } = params;
@@ -50,68 +50,102 @@ export function toggleValue(values: SelectPrimitive[], current: SelectPrimitive[
   }, current);
 }
 
-export interface SelectNormalizedOptions {
-  items: SelectItem[];
-  asChild?: boolean;
+export interface SelectNormalizeOption {
   getOptionValue?(item: SelectItem): SelectPrimitive;
   getOptionLabel?(item: SelectItem): SelectPrimitive;
   isGroup?(item: SelectItem): item is SelectItemGroup;
 }
 
-export function normalizeOptions(props: SelectNormalizedOptions): SelectItem<SelectPrimitive>[] {
-  const {
-    items,
-    asChild,
-    isGroup,
-    getOptionValue,
-    getOptionLabel,
-  } = props;
+export interface SelectNormalizedOptions extends SelectNormalizeOption {
+  items: SelectItem[];
+  asChild?: SelectAsChild;
+  getRelatedKey?(): string;
+}
 
-  if (asChild) {
-    return items as SelectItem<SelectPrimitive>[];
-  }
+export function normalizeOption(option: SelectItem, props: SelectNormalizeOption) {
+  const { isGroup, getOptionLabel, getOptionValue } = props;
 
-  const result: SelectItem[] = [];
-  let group: SelectItemGroup | null = null;
+  const group = !!(isGroup?.(option) || !!option.group);
+  const label = getOptionLabel?.(option) || option.label || "";
+  const value = getOptionValue?.(option) || option.value || label;
+  const children: SelectItemOption[] | undefined = group ? [] : undefined;
+
+  return { value, label, group, children } as SelectItem<SelectPrimitive>;
+}
+
+export function normalizeParentOptions(props: SelectNormalizedOptions) {
+  const { items, getRelatedKey } = props;
+  const relatedKey = getRelatedKey?.() || "children";
+  
+  return items.map((item) => {
+    const normalized = normalizeOption(item, props);
+
+    normalized.children = normalizeParentOptions({
+      ...props,
+      items: Array.isArray(item[relatedKey]) ? item[relatedKey] : [],
+    }) as SelectItemOption<SelectPrimitive>[];
+
+    normalized.group = !!normalized.children?.length
+
+    return { ...item, ...normalized };
+  }) as SelectItem<SelectPrimitive>[];
+}
+
+export function normalizeRelatedOptions(
+  props: SelectNormalizedOptions,
+  parent?: SelectPrimitive
+): SelectItem<SelectPrimitive>[] {
+  const { items, getRelatedKey } = props;
+  const relatedKey = getRelatedKey?.() || "parent";
+
+  return items
+    .filter((item) => parent === undefined ? !item[relatedKey] : item[relatedKey] === parent)
+    .map((item) => {
+      const normalized = normalizeOption(item, props);
+      normalized.children = normalizeRelatedOptions(props, normalized.value) as SelectItemOption<SelectPrimitive>[];
+
+      return {
+        ...item,
+        ...normalized,
+        group: !!normalized.children?.length
+      } as SelectItem<SelectPrimitive>
+    }) as SelectItem<SelectPrimitive>[];
+}
+
+export function normalizeFlatOptions(props: SelectNormalizedOptions) {
+  const { items } = props;
+  const result: SelectItem<SelectPrimitive>[] = [];
+  let group: SelectItemGroup<SelectPrimitive> | null = null;
 
   items.forEach((item) => {
-    const isItemGroup = isGroup ? isGroup(item) : !!item.group;
-    const value = getOptionValue ? getOptionValue(item) : item.value;
-    const label = getOptionLabel ? getOptionLabel(item) : item.label || "";
+    const normalized = normalizeOption(item, props);
 
-    if (isItemGroup) {
-      if (group) {
-        result.push(group);
-      }
-
-      group = {
-        ...item,
-        value,
-        label,
-        group: true,
-        children: []
-      } as SelectItemGroup;
+    if (normalized.group) {
+      group && result.push(group);
+      group = { ...item, ...normalized } as SelectItemGroup<SelectPrimitive>;
     } else if (group) {
-      group.children?.push({
-        ...item,
-        value,
-        label
-      } as SelectItemOption);
+      group.children?.push({ ...item, ...normalized } as SelectItemOption<SelectPrimitive>);
     } else {
-      result.push({
-        ...item,
-        value,
-        label
-      } as SelectItemOption);
+      result.push({ ...item, ...normalized } as SelectItemOption<SelectPrimitive>);
     }
-
   });
 
-  if (group) {
-    result.push(group);
+  group && result.push(group);
+  return result as SelectItem<SelectPrimitive>[];
+}
+
+export function normalizeOptions(props: SelectNormalizedOptions): SelectItem<SelectPrimitive>[] {
+  const { asChild } = props;
+
+  if (asChild === "parent") {
+    return normalizeParentOptions(props);
   }
 
-  return result as SelectItem<SelectPrimitive>[];
+  if (asChild === "related") {
+    return normalizeRelatedOptions(props);
+  }
+
+  return normalizeFlatOptions(props);
 }
 
 export function calcDropdownWidth(menuWidth: SelectPrimitive | undefined, ratio: number) {

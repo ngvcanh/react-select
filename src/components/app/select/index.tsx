@@ -12,6 +12,7 @@ import {
   useState
 } from "react";
 import {
+  SelectAsChild,
   SelectItem,
   SelectItemGroup,
   SelectItemOption,
@@ -83,7 +84,7 @@ export interface SelectProps {
   responsiveType?: SelectResponsiveType;
   backdrop?: SelectPortalBackdrop;
   modalWidth?: SelectPrimitive;
-  asChild?: boolean;
+  asChild?: SelectAsChild;
   splitColumns?: boolean;
   triggerColumn?: SelectTriggerColumn;
   menuWidth?: SelectPrimitive;
@@ -117,6 +118,8 @@ export interface SelectProps {
   renderMenuLabel?(params: SelectRenderMenuLabel): ReactNode;
   onChange?(e: SyntheticEvent): void;
   onClear?(): void;
+  onFilter?(option: SelectItem, search: string): boolean;
+  getRelatedKey?(): string;
 }
 
 export const Select = forwardRef<SelectRef, SelectProps>(
@@ -165,11 +168,13 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       isGroup,
       getOptionValue,
       getOptionLabel,
+      getRelatedKey,
       renderChip,
       renderValue = defaultRenderValue,
       renderMenuLabel,
       onChange,
       onClear,
+      onFilter,
     } = props;
 
     const [isOpen, setIsOpen] = useState(false);
@@ -183,13 +188,30 @@ export const Select = forwardRef<SelectRef, SelectProps>(
 
     const isSmallScreen = useMediaQuery(breakpoint, breakpoints);
 
+    // const filteredOptions = useMemo(() => options.filter((option) => {
+    //   if (!shouldFilter || !searchTerm.trim()) {
+    //     return true;
+    //   }
+
+    //   const isOptionGroup = !!(isGroup?.(option) || option.group);
+
+    //   if (onFilter) {
+    //     return onFilter(option, searchTerm);
+    //   }
+
+    //   const label = getOptionLabel?.(option) || option.label;
+
+    //   return label?.toString().toLowerCase().includes(searchTerm.toLowerCase());
+    // }), [options, searchTerm, shouldFilter, onFilter, getOptionLabel, isGroup]);
+
     const currentOptions = useMemo(() => normalizeOptions({
       items: options,
       asChild,
       isGroup,
       getOptionValue,
       getOptionLabel,
-    }), [options, asChild, isGroup, getOptionValue, getOptionLabel]);
+      getRelatedKey,
+    }), [options, asChild, isGroup, getOptionValue, getOptionLabel, getRelatedKey]);
 
     useEffect(() => {
       const nextValue = normalizeValue(value);
@@ -248,9 +270,26 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       multiple,
     ]);
 
-    const filteredOptions = currentOptions.filter((option) =>
-      !shouldFilter || option.label?.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filterItem = (option: SelectItem, search: string): boolean => {
+      const isValidLabel = (
+        onFilter?.(option, search) ??
+        !!option.label?.toString().toLowerCase().includes(search.toLowerCase())
+      );
+
+      if (!option.group) {
+        return isValidLabel;
+      }
+
+      const validChildren = (option as SelectItemGroup).children?.filter((child) => {
+        return filterItem(child, search);
+      });
+
+      return isValidLabel || !!validChildren?.length;
+    };
+
+    const filteredOptions = currentOptions.filter((option) => {
+      return !shouldFilter || !searchTerm.trim() || filterItem(option, searchTerm);
+    });
 
     const handleClickAnchor = () => {
       if (disabled || readonly) {
