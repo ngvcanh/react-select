@@ -370,6 +370,17 @@ export default function Home() {
           <Select options={options} multiple value={[1, 2, 3]} readonly />
         </Card>
       </Section>
+      <Section title="Highlighter">
+        <Card title="Default highlight">
+          <Select
+            options={options}
+            multiple
+            searchable
+            highlight
+            placeholder="Select option"
+          />
+        </Card>
+      </Section>
     </div>
   );
 }

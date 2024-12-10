@@ -1,8 +1,15 @@
-import { Fragment, ReactNode } from "react";
-import { SelectItem, SelectItemGroup, SelectItemOption, SelectPrimitive, SelectTriggerColumn } from "./types";
+import { Fragment, ReactNode, useMemo } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { SelectCheck } from "./SelectCheck";
-import { isSelectedStatus } from "./utils";
+import { htmlHighlighter, isSelectedStatus } from "./utils";
+import {
+  SelectItem,
+  SelectItemGroup,
+  SelectItemOption,
+  SelectOptionHandler,
+  SelectPrimitive,
+  SelectTriggerColumn
+} from "./types";
 import clsx from "clsx";
 
 export interface SelectOptionProps {
@@ -15,9 +22,13 @@ export interface SelectOptionProps {
   splitColumns?: boolean;
   triggerColumn?: SelectTriggerColumn;
   isLeft?: boolean;
+  search?: string;
+  highlight?: boolean;
+  highlightColor?: string;
   setSelectedRef?(instance: HTMLDivElement): void;
   onSelect(option: SelectItem<SelectPrimitive>): void;
   onTrigger?(option: SelectItem<SelectPrimitive> | null): void;
+  getHighlighter?: SelectOptionHandler<string>;
 }
 
 export function SelectOption(props: SelectOptionProps) {
@@ -31,10 +42,35 @@ export function SelectOption(props: SelectOptionProps) {
     triggerColumn = "hover",
     isLeft,
     iconGroup,
+    search = "",
+    highlight,
+    highlightColor = "#2c96ff",
     setSelectedRef,
     onSelect,
-    onTrigger
+    onTrigger,
+    getHighlighter,
   } = props;
+
+  const optionLabel = useMemo(() => {
+    if (!highlight) {
+      return option.label?.toString() || "";
+    }
+    console.log({
+      option,
+      search,
+      highlight,
+      highlightColor,
+      getHighlighter,
+    });
+    if (getHighlighter) {
+      return getHighlighter(option, search);
+    }
+    const highlighted = htmlHighlighter(option.label?.toString() || "", search, {
+      color: highlightColor,
+    });
+    console.log(highlighted)
+    return highlighted;
+  }, [getHighlighter, option, search, highlight, highlightColor]);
 
   const handleClickOption = (option: SelectItem<SelectPrimitive>) => () => {
     if (option.disabled || (option.group && !splitColumns)) {
@@ -111,7 +147,12 @@ export function SelectOption(props: SelectOptionProps) {
             size="md"
           />
         ) : null}
-        <span className="flex-grow">{option.label}</span>
+        <div
+          className="flex-grow"
+          dangerouslySetInnerHTML={{
+            __html: optionLabel,
+          }}
+        />
         {iconGroup !== null && option.group && (
           <span className="inline-flex h-full items-center px-2 -mr-2">
             {iconGroup ?? <GroupRightIcon className="w-4 h-4" />}
@@ -128,6 +169,10 @@ export function SelectOption(props: SelectOptionProps) {
               iconCheck={iconCheck}
               iconUncheck={iconUncheck}
               onSelect={onSelect}
+              highlight={highlight}
+              highlightColor={highlightColor}
+              getHighlighter={getHighlighter}
+              search={search}
             />
           </Fragment>
         ))

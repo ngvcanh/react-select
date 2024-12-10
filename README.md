@@ -27,12 +27,13 @@
 - [x] ✅ Auto scroll to first selected item (known issue: Do not scroll when rendered, current using setTimeout to scroll)
 - [x] ✅ Clearable
 - [x] ✅ Custom filter function
+- [x] ✅ Highlight search keyword
+- [x] ✅ Custom function highlight
 - [ ] ᠆ Auto fit horizontal dropdown with screen space
 - [ ] ᠆ Virtual scroll for long list
 - [ ] ᠆ Loading state when fetch options
 - [ ] ᠆ Keyboard navigation (arrow keys, enter, escapte)
 - [ ] ᠆ Async search/load options
 - [ ] ᠆ Custom option render function
-- [ ] ᠆ Highlight search keyword
 - [ ] ᠆ Unit test
 - [ ] ᠆ Security test

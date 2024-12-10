@@ -1,3 +1,5 @@
+import { RefObject } from "react";
+
 export type SelectPrimitive = string | number;
 export type SelectTriggerColumn = "hover" | "clicked" | "clickset";
 export type SelectResponsiveType = "modal" | "sheet";
@@ -40,4 +42,12 @@ export interface SelectRenderMenuLabel {
   setValue(value: SelectPrimitive[]): void;
 }
 
-export type SelectFilter = (option: SelectItem, search: string) => boolean;
+export type SelectOptionHandler<ReturnType> = (option: SelectItem, search: string) => ReturnType;
+
+export interface SelectRefs {
+  listLeft: RefObject<HTMLDivElement>;
+  listRight: RefObject<HTMLDivElement>;
+  anchor: RefObject<HTMLDivElement>;
+  search: RefObject<HTMLInputElement>;
+  portal: RefObject<SelectPortalRef>;
+}

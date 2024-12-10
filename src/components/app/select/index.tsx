@@ -8,7 +8,6 @@ import {
   useEffect,
   useImperativeHandle,
   useMemo,
-  useRef,
   useState
 } from "react";
 import {
@@ -16,8 +15,8 @@ import {
   SelectItem,
   SelectItemGroup,
   SelectItemOption,
+  SelectOptionHandler,
   SelectPortalBackdrop,
-  SelectPortalRef,
   SelectPrimitive,
   SelectRenderMenuLabel,
   SelectRenderValueParams,
@@ -27,10 +26,10 @@ import {
 } from "./types";
 import {
   createEvent,
-  defaultRenderValue,
   isEquals,
   normalizeOptions,
   normalizeValue,
+  searchText,
   toggleValue
 } from "./utils";
 import { Breakpoint, Breakpoints, useMediaQuery } from "./useMediaQuery";
@@ -41,6 +40,7 @@ import { SelectMenu } from "./SelectMenu";
 import { SelectAnchor } from "./SelectAnchor";
 import { SelectValue } from "./SelectValue";
 import { SelectSheet } from "./SelectSheet";
+import { useSelectRefs } from "./useSelectRefs";
 
 export interface SelectRef {
   anchor: HTMLDivElement | null;
@@ -110,16 +110,19 @@ export interface SelectProps {
   readonly?: boolean;
   scrollToSelected?: boolean;
   clearable?: boolean;
+  highlight?: boolean;
+  highlightColor?: string;
   isGroup?(item: SelectItem): item is SelectItemGroup;
-  getOptionValue?(item: SelectItem): SelectPrimitive;
-  getOptionLabel?(item: SelectItem): SelectPrimitive;
   renderChip?(option: SelectItem<SelectPrimitive> | number): JSX.Element;
   renderValue?(option: SelectItem<SelectPrimitive>, params: SelectRenderValueParams): ReactNode;
   renderMenuLabel?(params: SelectRenderMenuLabel): ReactNode;
-  onChange?(e: SyntheticEvent): void;
-  onClear?(): void;
-  onFilter?(option: SelectItem, search: string): boolean;
+  getOptionValue?(item: SelectItem): SelectPrimitive;
+  getOptionLabel?(item: SelectItem): SelectPrimitive;
   getRelatedKey?(): string;
+  getHighlighter?: SelectOptionHandler<string>;
+  onChange?(e: SyntheticEvent): void;
+  onFilter?: SelectOptionHandler<boolean>;
+  onClear?(): void;
 }
 
 export const Select = forwardRef<SelectRef, SelectProps>(
@@ -165,12 +168,15 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       disabled,
       readonly,
       scrollToSelected,
+      highlight,
+      highlightColor,
       isGroup,
       getOptionValue,
       getOptionLabel,
       getRelatedKey,
+      getHighlighter,
       renderChip,
-      renderValue = defaultRenderValue,
+      renderValue,
       renderMenuLabel,
       onChange,
       onClear,
@@ -182,27 +188,8 @@ export const Select = forwardRef<SelectRef, SelectProps>(
     const [currentValue, setCurrentValue] = useState(normalizeValue(value));
     const [searchTerm, setSearchTerm] = useState("");
 
-    const containerRef = useRef<HTMLDivElement>(null);
-    const searchRef = useRef<HTMLInputElement>(null);
-    const portalRef = useRef<SelectPortalRef>(null);
-
+    const refs = useSelectRefs();
     const isSmallScreen = useMediaQuery(breakpoint, breakpoints);
-
-    // const filteredOptions = useMemo(() => options.filter((option) => {
-    //   if (!shouldFilter || !searchTerm.trim()) {
-    //     return true;
-    //   }
-
-    //   const isOptionGroup = !!(isGroup?.(option) || option.group);
-
-    //   if (onFilter) {
-    //     return onFilter(option, searchTerm);
-    //   }
-
-    //   const label = getOptionLabel?.(option) || option.label;
-
-    //   return label?.toString().toLowerCase().includes(searchTerm.toLowerCase());
-    // }), [options, searchTerm, shouldFilter, onFilter, getOptionLabel, isGroup]);
 
     const currentOptions = useMemo(() => normalizeOptions({
       items: options,
@@ -224,12 +211,12 @@ export const Select = forwardRef<SelectRef, SelectProps>(
     }, []);
 
     useEffect(() => {
-      isOpen && searchable && searchRef.current?.focus();
-    }, [isOpen, searchable, searchRef]);
+      isOpen && searchable && refs.search.current?.focus();
+    }, [isOpen, searchable, refs.search]);
 
     useEffect(() => {
       requestAnimationFrame(() => {
-        isOpen ? portalRef.current?.open() : portalRef.current?.close();
+        isOpen ? refs.portal.current?.open() : refs.portal.current?.close();
       });
     });
 
@@ -240,10 +227,10 @@ export const Select = forwardRef<SelectRef, SelectProps>(
     }, []);
 
     useImperativeHandle(ref, () => ({
-      anchor: containerRef.current,
-      search: searchRef.current,
+      anchor: refs.anchor.current,
+      search: refs.search.current,
       opened: isOpen,
-      focus: () => containerRef.current?.click(),
+      focus: () => refs.anchor.current?.click(),
       blur: () => handleClosePortal(),
       open: () => setIsOpen(true),
       close: () => handleClosePortal(),
@@ -268,13 +255,12 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       handleClosePortal,
       isOpen,
       multiple,
+      refs,
     ]);
 
     const filterItem = (option: SelectItem, search: string): boolean => {
-      const isValidLabel = (
-        onFilter?.(option, search) ??
-        !!option.label?.toString().toLowerCase().includes(search.toLowerCase())
-      );
+      const searchResult = searchText(option.label?.toString() || "", search);
+      const isValidLabel = onFilter?.(option, search) ?? !!searchResult.length;
 
       if (!option.group) {
         return isValidLabel;
@@ -287,9 +273,19 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       return isValidLabel || !!validChildren?.length;
     };
 
-    const filteredOptions = currentOptions.filter((option) => {
-      return !shouldFilter || !searchTerm.trim() || filterItem(option, searchTerm);
-    });
+    const filteredOptions = currentOptions
+      .filter((option) => {
+        return !shouldFilter || !searchTerm.trim() || filterItem(option, searchTerm);
+      })
+      .map((option) => {
+        if (option.group) {
+          option.children = option.children?.filter((child) => {
+            return !shouldFilter || !searchTerm.trim() || filterItem(child, searchTerm);
+          });
+        }
+
+        return option;
+      });
 
     const handleClickAnchor = () => {
       if (disabled || readonly) {
@@ -354,7 +350,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
         ): null}
         {searchable && searchPosition === "dropdown" && (
           <SelectSearch
-            ref={searchRef}
+            ref={refs.search}
             value={searchTerm}
             iconSearch={iconSearch}
             onChange={handleChangeSearch}
@@ -363,6 +359,10 @@ export const Select = forwardRef<SelectRef, SelectProps>(
         )}
         <SelectMenu
           {...{
+            refs: {
+              listLeft: refs.listLeft,
+              listRight: refs.listRight,
+            },
             options: filteredOptions,
             value: currentValue,
             showCheckbox,
@@ -375,6 +375,10 @@ export const Select = forwardRef<SelectRef, SelectProps>(
             renderMenuLabel,
             setValue: setCurrentValue,
             scrollToSelected,
+            highlight,
+            getHighlighter,
+            highlightColor,
+            search: searchTerm,
           }}
         />
         {components.footer ? (
@@ -390,7 +394,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
     return (
       <>
         <SelectAnchor
-          ref={containerRef}
+          ref={refs.anchor}
           className={className}
           opened={isOpen}
           separator={separator}
@@ -416,7 +420,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
               search: searchTerm,
               opened: isOpen,
               removable,
-              searchRef,
+              searchRef: refs.search,
               renderValue,
               renderChip,
               onRemove: handleRemoveValue,
@@ -432,7 +436,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
             responsiveType === "sheet"
               ? (
                 <SelectSheet
-                  ref={portalRef}
+                  ref={refs.portal}
                   maxHeight={maxHeight}
                   backdrop={backdrop}
                   onClose={handleClosePortal}
@@ -441,7 +445,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
                 </SelectSheet>
               ) : (
                 <SelectModal
-                  ref={portalRef}
+                  ref={refs.portal}
                   width={modalWidth}
                   maxHeight={maxHeight}
                   backdrop={backdrop}
@@ -452,8 +456,12 @@ export const Select = forwardRef<SelectRef, SelectProps>(
               )
           ) : (
             <SelectDropdown
-              ref={portalRef}
-              anchorRef={containerRef}
+              ref={refs.portal}
+              refs={{
+                listLeft: refs.listLeft,
+                listRight: refs.listRight,
+                anchor: refs.anchor,
+              }}
               offset={offset}
               maxHeight={maxHeight}
               splitColumns={splitColumns}

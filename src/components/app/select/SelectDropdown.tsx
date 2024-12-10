@@ -1,31 +1,30 @@
 import {
   forwardRef,
   PropsWithChildren,
-  RefObject,
   useEffect,
   useImperativeHandle,
   useRef,
   useState
 } from "react";
 import { SelectPortal } from "./SelectPortal";
-import { SelectPortalRef, SelectPrimitive } from "./types";
+import { SelectPortalRef, SelectPrimitive, SelectRefs } from "./types";
 import { calcDropdownWidth } from "./utils";
 
 export interface SelectDropdownProps {
-  anchorRef: RefObject<HTMLDivElement>;
   offset?: number;
   maxHeight?: SelectPrimitive;
   splitColumns?: boolean;
   menuWidth?: SelectPrimitive;
   autoFit?: boolean;
+  refs: Pick<SelectRefs, "listLeft" | "listRight" | "anchor">;
   onClose?(): void;
 }
 
 export const SelectDropdown = forwardRef<SelectPortalRef, PropsWithChildren<SelectDropdownProps>>(
   function SelectDropdown(props, ref) {
     const {
+      refs,
       offset = 4,
-      anchorRef,
       maxHeight,
       splitColumns,
       menuWidth,
@@ -44,12 +43,12 @@ export const SelectDropdown = forwardRef<SelectPortalRef, PropsWithChildren<Sele
     }));
 
     useEffect(() => {
-      if (!isOpen || !anchorRef.current || !dropdownRef.current) {
+      if (!isOpen || !refs.anchor.current || !dropdownRef.current) {
         return;
       }
 
       function updatePosition() {
-        if (!anchorRef.current || !dropdownRef.current || typeof window === "undefined") {
+        if (!refs.anchor.current || !dropdownRef.current || typeof window === "undefined") {
           return;
         }
 
@@ -57,7 +56,7 @@ export const SelectDropdown = forwardRef<SelectPortalRef, PropsWithChildren<Sele
         dropdownRef.current.style.bottom = "";
         dropdownRef.current.style.height = "";
 
-        const containerRect = anchorRef.current.getBoundingClientRect();
+        const containerRect = refs.anchor.current.getBoundingClientRect();
         const dropdownRect = dropdownRef.current.getBoundingClientRect();
 
         const topOfDropdown = containerRect.bottom + offset;
@@ -69,7 +68,6 @@ export const SelectDropdown = forwardRef<SelectPortalRef, PropsWithChildren<Sele
             ? dropdownRef.current.scrollHeight
             : Math.min(dropdownRef.current.scrollHeight, dropdownRect.height)
         );
-        
 
         const w = calcDropdownWidth(menuWidth, ratio);
         const rectWidth = containerRect.width * ratio;
@@ -109,8 +107,11 @@ export const SelectDropdown = forwardRef<SelectPortalRef, PropsWithChildren<Sele
 
       const resizeObserver = new ResizeObserver(updatePosition);
       const intersectionObserver = new IntersectionObserver(updatePosition);
-      resizeObserver.observe(anchorRef.current);
-      intersectionObserver.observe(anchorRef.current);
+      resizeObserver.observe(refs.anchor.current!);
+      resizeObserver.observe(dropdownRef.current);
+      resizeObserver.observe(refs.listLeft.current!);
+      refs.listRight.current && resizeObserver.observe(refs.listRight.current);
+      intersectionObserver.observe(refs.anchor.current!);
 
       window.addEventListener("resize", updatePosition);
       window.addEventListener("scroll", updatePosition);
@@ -121,7 +122,7 @@ export const SelectDropdown = forwardRef<SelectPortalRef, PropsWithChildren<Sele
         resizeObserver.disconnect();
         intersectionObserver.disconnect();
       };
-    }, [isOpen, offset, anchorRef, splitColumns, menuWidth, autoFit, maxHeight]);
+    }, [isOpen, offset, refs, splitColumns, menuWidth, autoFit, maxHeight]);
 
     useEffect(() => {
       if (typeof document === "undefined") {
@@ -130,7 +131,7 @@ export const SelectDropdown = forwardRef<SelectPortalRef, PropsWithChildren<Sele
 
       function handleClickOutside(e: MouseEvent) {
         if (
-          anchorRef.current?.contains(e.target as Node) ||
+          refs.anchor.current?.contains(e.target as Node) ||
           dropdownRef.current?.contains(e.target as Node)
         ) {
           return;
@@ -145,7 +146,7 @@ export const SelectDropdown = forwardRef<SelectPortalRef, PropsWithChildren<Sele
       return () => {
         document.removeEventListener("click", handleClickOutside);
       };
-    }, [onClose, anchorRef]);
+    }, [onClose, refs.anchor]);
 
     return (
       <SelectPortal show={isOpen}>
