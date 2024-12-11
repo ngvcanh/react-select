@@ -108,13 +108,13 @@ export function SelectValue(props: SelectValueProps) {
     return (
       <>
         {displayOptions.map((option, index) => (
-          <Fragment key={option.value}>
+          <span key={option.value} className={clsx("w-full", truncate ? "truncate" : "whitespace-nowrap")}>
             {renderValue(option, {
               multiple,
               index,
               isLast: index === displayOptions.length - 1,
             })}
-          </Fragment>
+          </span>
         ))}
         {remaining > 0 && (
           <span>, +{remaining}</span>

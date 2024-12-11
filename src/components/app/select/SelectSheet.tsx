@@ -8,6 +8,7 @@ export interface SelectSheetProps {
   maxHeight?: SelectPrimitive;
   menuHeight?: SelectPrimitive;
   backdrop?: "static" | "closeable";
+  zIndex?: number;
   className?: string;
   classNames?: {
     portal?: string;
@@ -29,7 +30,7 @@ const Animated = {
 
 export const SelectSheet = forwardRef<SelectPortalRef, PropsWithChildren<SelectSheetProps>>(
   function SelectSheet(props, ref) {
-    const { opened, maxHeight, menuHeight, children, backdrop = "closeable", className, classNames = {}, onClose } = props;
+    const { opened, maxHeight, menuHeight, children, backdrop = "closeable", zIndex, className, classNames = {}, onClose } = props;
 
     return (
       <SelectDialog
@@ -38,6 +39,7 @@ export const SelectSheet = forwardRef<SelectPortalRef, PropsWithChildren<SelectS
         animation={Animated}
         backdrop={backdrop}
         onClose={onClose}
+        zIndex={zIndex}
         className={clsx("rounded-t-lg w-full", className)}
         classNames={{
           ...classNames,

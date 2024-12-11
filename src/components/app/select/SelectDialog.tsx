@@ -17,6 +17,7 @@ export interface SelectDialogProps {
   opened?: boolean;
   onClose?(): void;
   backdrop?: SelectPortalBackdrop;
+  zIndex?: number;
   className?: string;
   classNames?: {
     portal?: string;
@@ -47,6 +48,7 @@ export const SelectDialog = forwardRef<SelectPortalRef, PropsWithChildren<Select
       animation,
       maxHeight = "100dvh",
       children,
+      zIndex,
       style = {}
     } = props;
 
@@ -144,7 +146,14 @@ export const SelectDialog = forwardRef<SelectPortalRef, PropsWithChildren<Select
 
     return (
       <SelectPortal show={isOpen}>
-        <div className={clsx("fixed inset-0 overflow-hidden z-50", classNames.portal)}>
+        <div
+          className={clsx(
+            "fixed inset-0 overflow-hidden",
+            zIndex === undefined && "z-50",
+            classNames.portal
+          )}
+          style={{ zIndex }}
+        >
           <div
             ref={backdropRef}
             className={clsx(

@@ -1,15 +1,14 @@
 import { ComponentType, forwardRef, Fragment, MouseEvent, PropsWithChildren, ReactNode } from "react";
-import { ChevronDown } from "lucide-react";
 import { SelectSeparator } from "./SelectSeparator";
 import { SelectSize } from "./types";
 import { getSelectSize } from "./utils";
-import clsx from "clsx";
 import { SelectClearable } from "./SelectClearable";
+import { ChevronDown } from "lucide-react";
+import clsx from "clsx";
 
 export interface SelectAnchorProps {
   className?: string;
   wrapper?: ComponentType;
-  truncate?: boolean;
   separator?: boolean;
   iconDropdown?: ReactNode;
   opened?: boolean;
@@ -29,7 +28,6 @@ export const SelectAnchor = forwardRef<HTMLDivElement, PropsWithChildren<SelectA
       opened,
       wrapper: Wrapper = Fragment,
       separator,
-      truncate,
       size,
       disabled,
       clearable,
@@ -43,7 +41,7 @@ export const SelectAnchor = forwardRef<HTMLDivElement, PropsWithChildren<SelectA
       <div
         ref={ref}
         className={clsx(
-          "border rounded cursor-pointer w-full",
+          "border rounded cursor-pointer w-full overflow-x-hidden",
           {
             "bg-gray-400/40": disabled,
             "hover:border-blue-500": !disabled,
@@ -60,7 +58,10 @@ export const SelectAnchor = forwardRef<HTMLDivElement, PropsWithChildren<SelectA
             )}
             onClick={onClick}
           >
-            <div className={clsx("flex-1 min-w-0", truncate ? "truncate" : "", selectSize.classes?.anchorText)}>
+            <div className={clsx(
+              "flex-1 min-w-0 w-full overflow-hidden whitespace-nowrap",
+              selectSize.classes?.anchorText
+            )}>
               {children}
             </div>
             <SelectClearable enabled={!!clearable} onClick={onClearable} />

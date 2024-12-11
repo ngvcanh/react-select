@@ -9,6 +9,7 @@ export interface SelectModalProps {
   maxHeight?: SelectPrimitive;
   className?: string;
   backdrop?: "static" | "closeable";
+  zIndex?: number;
   classNames?: {
     portal?: string;
     backdrop?: string;
@@ -37,6 +38,7 @@ export const SelectModal = forwardRef<SelectPortalRef, PropsWithChildren<SelectM
       classNames = {},
       children,
       backdrop,
+      zIndex,
       onClose
     } = props;
 
@@ -46,6 +48,7 @@ export const SelectModal = forwardRef<SelectPortalRef, PropsWithChildren<SelectM
         opened={opened}
         onClose={onClose}
         animation={Animated}
+        zIndex={zIndex}
         className={clsx("rounded-lg", className)}
         backdrop={backdrop}
         maxHeight={maxHeight}

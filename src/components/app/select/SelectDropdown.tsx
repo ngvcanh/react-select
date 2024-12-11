@@ -9,6 +9,7 @@ import {
 import { SelectPortal } from "./SelectPortal";
 import { SelectPortalRef, SelectPrimitive, SelectRefs } from "./types";
 import { calcDropdownWidth } from "./utils";
+import clsx from "clsx";
 
 export interface SelectDropdownProps {
   offset?: number;
@@ -17,6 +18,7 @@ export interface SelectDropdownProps {
   menuWidth?: SelectPrimitive;
   autoFit?: boolean;
   refs: Pick<SelectRefs, "listLeft" | "listRight" | "anchor">;
+  zIndex?: number;
   onClose?(): void;
 }
 
@@ -30,6 +32,7 @@ export const SelectDropdown = forwardRef<SelectPortalRef, PropsWithChildren<Sele
       menuWidth,
       children,
       autoFit = true,
+      zIndex,
       onClose
     } = props;
 
@@ -73,7 +76,7 @@ export const SelectDropdown = forwardRef<SelectPortalRef, PropsWithChildren<Sele
         const rectWidth = containerRect.width * ratio;
         const dropdownWidth = w ? w === "auto" ? rectWidth : w : rectWidth;
 
-        dropdownRef.current.style.width = `${dropdownWidth}px`;
+        dropdownRef.current.style.width = dropdownWidth as string;
         dropdownRef.current.style.left = `${containerRect.left}px`;
 
         if (autoFit) {
@@ -130,9 +133,17 @@ export const SelectDropdown = forwardRef<SelectPortalRef, PropsWithChildren<Sele
       }
 
       function handleClickOutside(e: MouseEvent) {
+        if (!refs.anchor.current || !dropdownRef.current) {
+          return;
+        }
+
         if (
+          !refs.anchor.current ||
+          !dropdownRef.current ||
           refs.anchor.current?.contains(e.target as Node) ||
-          dropdownRef.current?.contains(e.target as Node)
+          refs.anchor.current.isEqualNode(e.target as Node) ||
+          dropdownRef.current?.contains(e.target as Node) ||
+          dropdownRef.current?.isEqualNode(e.target as Node)
         ) {
           return;
         }
@@ -152,8 +163,11 @@ export const SelectDropdown = forwardRef<SelectPortalRef, PropsWithChildren<Sele
       <SelectPortal show={isOpen}>
         <div
           ref={dropdownRef}
-          className="absolute z-10 w-full bg-white border rounded shadow-lg text-slate-950 text-sm overflow-y-auto"
-          style={{ maxHeight }}
+          className={clsx(
+            "absolute w-full bg-white border rounded shadow-lg text-slate-950 text-sm overflow-y-auto",
+            zIndex === undefined && "z-10"
+          )}
+          style={{ maxHeight, zIndex }}
         >
           {children}
         </div>

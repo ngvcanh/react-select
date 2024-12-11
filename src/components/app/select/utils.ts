@@ -67,7 +67,7 @@ export function normalizeOption(option: SelectItem, props: SelectNormalizeOption
 
   const group = !!(isGroup?.(option) || !!option.group);
   const label = getOptionLabel?.(option) || option.label || "";
-  const value = getOptionValue?.(option) || option.value || label;
+  const value = getOptionValue?.(option) ?? option.value ?? label;
   const children: SelectItemOption[] | undefined = group ? [] : undefined;
 
   return { value, label, group, children } as SelectItem<SelectPrimitive>;

@@ -41,6 +41,7 @@ import { SelectAnchor } from "./SelectAnchor";
 import { SelectValue } from "./SelectValue";
 import { SelectSheet } from "./SelectSheet";
 import { useSelectRefs } from "./useSelectRefs";
+import { SelectControlled } from "./SelectControlled";
 
 export interface SelectRef {
   anchor: HTMLDivElement | null;
@@ -112,6 +113,7 @@ export interface SelectProps {
   clearable?: boolean;
   highlight?: boolean;
   highlightColor?: string;
+  zIndex?: number;
   isGroup?(item: SelectItem): item is SelectItemGroup;
   renderChip?(option: SelectItem<SelectPrimitive> | number): JSX.Element;
   renderValue?(option: SelectItem<SelectPrimitive>, params: SelectRenderValueParams): ReactNode;
@@ -170,6 +172,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
       scrollToSelected,
       highlight,
       highlightColor,
+      zIndex,
       isGroup,
       getOptionValue,
       getOptionLabel,
@@ -430,6 +433,11 @@ export const Select = forwardRef<SelectRef, SelectProps>(
               groupCollapse,
             }}
           />
+          <SelectControlled
+            name={name}
+            value={currentValue}
+            multiple={multiple}
+          />
         </SelectAnchor>
         {responsiveType && isSmallScreen
           ? (
@@ -440,6 +448,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
                   maxHeight={maxHeight}
                   backdrop={backdrop}
                   onClose={handleClosePortal}
+                  zIndex={zIndex}
                 >
                   {dropdownContent}
                 </SelectSheet>
@@ -450,6 +459,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
                   maxHeight={maxHeight}
                   backdrop={backdrop}
                   onClose={handleClosePortal}
+                  zIndex={zIndex}
                 >
                   {dropdownContent}
                 </SelectModal>
@@ -468,6 +478,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(
               menuWidth={menuWidth}
               autoFit={autoFit}
               onClose={handleClosePortal}
+              zIndex={zIndex}
             >
               {dropdownContent}
             </SelectDropdown>

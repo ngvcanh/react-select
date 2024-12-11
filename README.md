@@ -23,12 +23,15 @@
 - [x] ✅ Display group label instance children if select all [groupCollapse]
 - [x] ✅ Disabled for select
 - [x] ✅ Readonly for select
+- [x] ✅ Custom header component
+- [x] ✅ Custom footer component
 - [x] ✅ Render select label in dropdown (using `renderMenuLabel`)
 - [x] ✅ Auto scroll to first selected item (known issue: Do not scroll when rendered, current using setTimeout to scroll)
 - [x] ✅ Clearable
 - [x] ✅ Custom filter function
 - [x] ✅ Highlight search keyword
 - [x] ✅ Custom function highlight
+- [x] ✅ Custom zIndex
 - [ ] ᠆ Auto fit horizontal dropdown with screen space
 - [ ] ᠆ Virtual scroll for long list
 - [ ] ᠆ Loading state when fetch options
